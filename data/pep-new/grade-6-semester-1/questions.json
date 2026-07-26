@@ -1,0 +1,250 @@
+[
+  {
+    "unit": 1,
+    "type": "tense_choice",
+    "prompt": "Where did you ___ last summer?",
+    "options": [
+      "go",
+      "went",
+      "going"
+    ],
+    "answer": "go",
+    "explanation": "did 后使用动词原形。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 1,
+    "type": "tense_choice",
+    "prompt": "I ___ the Great Wall yesterday.",
+    "options": [
+      "climb",
+      "climbed",
+      "climbing"
+    ],
+    "answer": "climbed",
+    "explanation": "yesterday 表示过去。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 1,
+    "type": "sentence_correction",
+    "prompt": "判断并改正：Where did you went?",
+    "options": [
+      "Where did you go?",
+      "Where you went?",
+      "Where do you went?"
+    ],
+    "answer": "Where did you go?",
+    "explanation": "did 后使用动词原形。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 2,
+    "type": "tense_choice",
+    "prompt": "Did you ___ mooncakes?",
+    "options": [
+      "eat",
+      "ate",
+      "eats"
+    ],
+    "answer": "eat",
+    "explanation": "Did 开头的一般疑问句使用动词原形。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 2,
+    "type": "true_false",
+    "prompt": "“Yes, we did.” 可以回答 “Did you take a trip?”",
+    "options": [
+      "正确",
+      "错误"
+    ],
+    "answer": "正确",
+    "explanation": "Did 问句可用 did 简短回答。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 2,
+    "type": "sentence_correction",
+    "prompt": "选择正确句子。",
+    "options": [
+      "Did she sing?",
+      "Did she sang?",
+      "Does she sang?"
+    ],
+    "answer": "Did she sing?",
+    "explanation": "did 后使用原形 sing。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 3,
+    "type": "grammar_choice",
+    "prompt": "You have a fever. You ___ see a doctor.",
+    "options": [
+      "should",
+      "shouldn’t",
+      "are"
+    ],
+    "answer": "should",
+    "explanation": "生病时应当看医生。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 3,
+    "type": "grammar_choice",
+    "prompt": "We shouldn’t ___ up late.",
+    "options": [
+      "stay",
+      "stayed",
+      "stays"
+    ],
+    "answer": "stay",
+    "explanation": "shouldn’t 后使用动词原形。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 3,
+    "type": "true_false",
+    "prompt": "“You should to exercise.” 这个句子正确吗？",
+    "options": [
+      "正确",
+      "错误"
+    ],
+    "answer": "错误",
+    "explanation": "should 后不加 to。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 4,
+    "type": "grammar_choice",
+    "prompt": "I am going to ___ some books.",
+    "options": [
+      "buy",
+      "bought",
+      "buying"
+    ],
+    "answer": "buy",
+    "explanation": "be going to 后使用动词原形。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 4,
+    "type": "grammar_choice",
+    "prompt": "She ___ going to save money.",
+    "options": [
+      "is",
+      "are",
+      "am"
+    ],
+    "answer": "is",
+    "explanation": "主语 She 搭配 is。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 4,
+    "type": "sentence_correction",
+    "prompt": "选择正确句子。",
+    "options": [
+      "They are going to make a plan.",
+      "They is going to make a plan.",
+      "They are going make a plan."
+    ],
+    "answer": "They are going to make a plan.",
+    "explanation": "They 搭配 are，且保留 to。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 5,
+    "type": "grammar_choice",
+    "prompt": "There ___ a moon in the sky.",
+    "options": [
+      "is",
+      "are",
+      "be"
+    ],
+    "answer": "is",
+    "explanation": "后面的名词 moon 是单数。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 5,
+    "type": "grammar_choice",
+    "prompt": "There ___ many stars in the sky.",
+    "options": [
+      "are",
+      "is",
+      "am"
+    ],
+    "answer": "are",
+    "explanation": "后面的名词 stars 是复数。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 5,
+    "type": "true_false",
+    "prompt": "“There are a planet.” 这个句子正确吗？",
+    "options": [
+      "正确",
+      "错误"
+    ],
+    "answer": "错误",
+    "explanation": "a planet 是单数，应使用 There is。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 6,
+    "type": "grammar_choice",
+    "prompt": "We should ___ water.",
+    "options": [
+      "save",
+      "saved",
+      "saves"
+    ],
+    "answer": "save",
+    "explanation": "should 后使用动词原形。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 6,
+    "type": "grammar_choice",
+    "prompt": "We can ___ old things.",
+    "options": [
+      "reuse",
+      "reused",
+      "reuses"
+    ],
+    "answer": "reuse",
+    "explanation": "can 后使用动词原形。",
+    "original": true,
+    "verification_status": "verified"
+  },
+  {
+    "unit": 6,
+    "type": "true_false",
+    "prompt": "“We should waste energy.” 是合适的环保建议吗？",
+    "options": [
+      "是",
+      "不是"
+    ],
+    "answer": "不是",
+    "explanation": "环保建议应当节约能源。",
+    "original": true,
+    "verification_status": "verified"
+  }
+]

@@ -1,0 +1,58 @@
+﻿unit_no,unit_id,order,content,meaning,example
+1,pep_new_g6_s1_u1,1,take a trip,去旅行,I took a trip to Shanghai.
+1,pep_new_g6_s1_u1,2,walk around,四处走走,We walked around the old city.
+1,pep_new_g6_s1_u1,3,take photos,拍照,She took nice photos there.
+1,pep_new_g6_s1_u1,4,climb the Great Wall,爬长城,I climbed the Great Wall.
+1,pep_new_g6_s1_u1,5,over the summer holidays,暑假期间,Where did you go over the summer holidays?
+1,pep_new_g6_s1_u1,6,with my family,和我的家人一起,I went to Xi'an with my family.
+1,pep_new_g6_s1_u1,7,sound interesting,听起来有趣,That sounds interesting.
+1,pep_new_g6_s1_u1,8,a must-see,必看之地,It is a must-see.
+2,pep_new_g6_s1_u2,1,Mid-Autumn Festival,中秋节,How was your Mid-Autumn Festival holiday?
+2,pep_new_g6_s1_u2,2,eat mooncakes,吃月饼,Did you eat mooncakes?
+2,pep_new_g6_s1_u2,3,take a trip,去旅行,Did you take a trip?
+2,pep_new_g6_s1_u2,4,go to a marathon,去参加/观看马拉松活动,We went to a marathon.
+2,pep_new_g6_s1_u2,5,watch the runners,看赛跑者,I liked watching the runners.
+2,pep_new_g6_s1_u2,6,dress up,装扮,We dressed up for the gala.
+2,pep_new_g6_s1_u2,7,count down,倒计时,We counted down together.
+2,pep_new_g6_s1_u2,8,cheer for...,为……加油,We cheered for the teams.
+2,pep_new_g6_s1_u2,9,dragon boat race,龙舟赛,I watched a dragon boat race.
+3,pep_new_g6_s1_u3,1,feel ill,感觉不舒服,I feel ill.
+3,pep_new_g6_s1_u3,2,have a runny nose,流鼻涕,I have a runny nose.
+3,pep_new_g6_s1_u3,3,have a fever,发烧,I have a fever.
+3,pep_new_g6_s1_u3,4,have a cough,咳嗽,I have a cough.
+3,pep_new_g6_s1_u3,5,see a doctor,看医生,You should see a doctor.
+3,pep_new_g6_s1_u3,6,eat healthy food,吃健康食物,We need to eat healthy food.
+3,pep_new_g6_s1_u3,7,exercise too,也要运动,We should exercise too.
+3,pep_new_g6_s1_u3,8,have a healthy diet,保持健康饮食,Have a healthy diet.
+3,pep_new_g6_s1_u3,9,stay up late,熬夜,Don't stay up late.
+3,pep_new_g6_s1_u3,10,think about happy things,想开心的事情,Think about happy things.
+3,pep_new_g6_s1_u3,11,join clubs and teams,加入俱乐部和团队,Join clubs and teams.
+4,pep_new_g6_s1_u4,1,pocket money,零花钱,How do you use your pocket money?
+4,pep_new_g6_s1_u4,2,spend money,花钱,How are you going to spend it?
+4,pep_new_g6_s1_u4,3,buy a schoolbag,买书包,I'm going to buy a schoolbag.
+4,pep_new_g6_s1_u4,4,save more,多攒钱,I need to save more.
+4,pep_new_g6_s1_u4,5,save up,攒钱,I'm saving up for a bike.
+4,pep_new_g6_s1_u4,6,on sale,特价销售,The ticket is on sale.
+4,pep_new_g6_s1_u4,7,a pair of sunglasses,一副太阳镜,I'm going to buy a pair of sunglasses.
+4,pep_new_g6_s1_u4,8,make a spending plan,制作消费计划,Make a spending plan for next month.
+5,pep_new_g6_s1_u5,1,in the sky,在天空中,What can you see in the sky?
+5,pep_new_g6_s1_u5,2,at night,在晚上,"At night, we can see the Moon."
+5,pep_new_g6_s1_u5,3,outer space,外太空,What can we see from outer space?
+5,pep_new_g6_s1_u5,4,space station,空间站,They work in the space station.
+5,pep_new_g6_s1_u5,5,living things,生物,There aren't any living things.
+5,pep_new_g6_s1_u5,6,on Mars,在火星上,Is there any water on Mars?
+5,pep_new_g6_s1_u5,7,put a rover on Mars,在火星上放置探测器,China put a rover on Mars.
+5,pep_new_g6_s1_u5,8,get up early,早起,The taikonauts get up early.
+5,pep_new_g6_s1_u5,9,solar system,太阳系,Learn facts about our solar system.
+6,pep_new_g6_s1_u6,1,running water,流水,Running water can make electricity.
+6,pep_new_g6_s1_u6,2,green energy,绿色能源,Solar power is green energy.
+6,pep_new_g6_s1_u6,3,water power,水能,Water power is useful.
+6,pep_new_g6_s1_u6,4,solar power,太阳能,Solar power comes from the Sun.
+6,pep_new_g6_s1_u6,5,wind power,风能,Wind power is clean.
+6,pep_new_g6_s1_u6,6,run out,用完,Many resources are running out.
+6,pep_new_g6_s1_u6,7,save energy,节约能源,How can we save energy?
+6,pep_new_g6_s1_u6,8,take quick showers,快速淋浴,We can take quick showers.
+6,pep_new_g6_s1_u6,9,use LED lighting,使用 LED 照明,We can use LED lighting.
+6,pep_new_g6_s1_u6,10,unplug computers and TVs,拔掉电脑和电视电源,We should unplug computers and TVs.
+6,pep_new_g6_s1_u6,11,use air conditioners less,少用空调,We should use air conditioners less.
+6,pep_new_g6_s1_u6,12,reuse bottles,重复使用瓶子,We can reuse bottles.

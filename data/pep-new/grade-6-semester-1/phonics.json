@@ -1,0 +1,222 @@
+[
+  {
+    "symbol": "/iː/",
+    "example": "see /siː/",
+    "note": "长“衣”"
+  },
+  {
+    "symbol": "/ɪ/",
+    "example": "ill /ɪl/",
+    "note": "短“衣”"
+  },
+  {
+    "symbol": "/e/",
+    "example": "head /hed/",
+    "note": "“哎”"
+  },
+  {
+    "symbol": "/æ/",
+    "example": "apple /ˈæpəl/",
+    "note": "介于“啊”和“哎”之间"
+  },
+  {
+    "symbol": "/ʌ/",
+    "example": "run /rʌn/",
+    "note": "短“啊”"
+  },
+  {
+    "symbol": "/ɑː/",
+    "example": "star /stɑː/",
+    "note": "长“啊”"
+  },
+  {
+    "symbol": "/ɒ/",
+    "example": "cough /kɒf/",
+    "note": "短“哦”"
+  },
+  {
+    "symbol": "/ɔː/",
+    "example": "call /kɔːl/",
+    "note": "长“哦”"
+  },
+  {
+    "symbol": "/ʊ/",
+    "example": "took /tʊk/",
+    "note": "短“乌”"
+  },
+  {
+    "symbol": "/uː/",
+    "example": "moon /muːn/",
+    "note": "长“乌”"
+  },
+  {
+    "symbol": "/ɜː/",
+    "example": "earth /ɜːθ/",
+    "note": "长“额”"
+  },
+  {
+    "symbol": "/ə/",
+    "example": "about /əˈbaʊt/",
+    "note": "轻声“额”"
+  },
+  {
+    "symbol": "/eɪ/",
+    "example": "take /teɪk/",
+    "note": "“诶”"
+  },
+  {
+    "symbol": "/aɪ/",
+    "example": "climb /klaɪm/",
+    "note": "“爱”"
+  },
+  {
+    "symbol": "/ɔɪ/",
+    "example": "boy /bɔɪ/",
+    "note": "“奥伊”"
+  },
+  {
+    "symbol": "/aʊ/",
+    "example": "cloud /klaʊd/",
+    "note": "“啊乌”"
+  },
+  {
+    "symbol": "/əʊ/",
+    "example": "go /ɡəʊ/",
+    "note": "“欧”"
+  },
+  {
+    "symbol": "/ɪə/",
+    "example": "hear /hɪə/",
+    "note": "“衣额”"
+  },
+  {
+    "symbol": "/eə/",
+    "example": "wear /weə/",
+    "note": "“哎额”"
+  },
+  {
+    "symbol": "/ʊə/",
+    "example": "tour /tʊə/",
+    "note": "“乌额”"
+  },
+  {
+    "symbol": "/p/",
+    "example": "paste",
+    "note": "清辅音"
+  },
+  {
+    "symbol": "/b/",
+    "example": "bamboo",
+    "note": "浊辅音"
+  },
+  {
+    "symbol": "/t/",
+    "example": "time",
+    "note": "舌尖抵上齿龈"
+  },
+  {
+    "symbol": "/d/",
+    "example": "dry",
+    "note": "/t/ 的浊音"
+  },
+  {
+    "symbol": "/k/",
+    "example": "cold",
+    "note": "舌后部发力"
+  },
+  {
+    "symbol": "/ɡ/",
+    "example": "go",
+    "note": "/k/ 的浊音"
+  },
+  {
+    "symbol": "/f/",
+    "example": "fever",
+    "note": "上齿轻碰下唇"
+  },
+  {
+    "symbol": "/v/",
+    "example": "view",
+    "note": "/f/ 的浊音"
+  },
+  {
+    "symbol": "/s/",
+    "example": "sky",
+    "note": "像“丝”"
+  },
+  {
+    "symbol": "/z/",
+    "example": "zero",
+    "note": "/s/ 的浊音"
+  },
+  {
+    "symbol": "/θ/",
+    "example": "earth",
+    "note": "舌尖轻放齿间"
+  },
+  {
+    "symbol": "/ð/",
+    "example": "there",
+    "note": "/θ/ 的浊音"
+  },
+  {
+    "symbol": "/ʃ/",
+    "example": "shower",
+    "note": "像“嘘”"
+  },
+  {
+    "symbol": "/ʒ/",
+    "example": "usually",
+    "note": "/ʃ/ 的浊音"
+  },
+  {
+    "symbol": "/tʃ/",
+    "example": "cheer",
+    "note": "像“吃”"
+  },
+  {
+    "symbol": "/dʒ/",
+    "example": "judge",
+    "note": "像“知”"
+  },
+  {
+    "symbol": "/m/",
+    "example": "money",
+    "note": "双唇闭合"
+  },
+  {
+    "symbol": "/n/",
+    "example": "nose",
+    "note": "舌尖抵上齿龈"
+  },
+  {
+    "symbol": "/ŋ/",
+    "example": "sing",
+    "note": "后鼻音"
+  },
+  {
+    "symbol": "/l/",
+    "example": "light",
+    "note": "舌尖抵上齿龈"
+  },
+  {
+    "symbol": "/r/",
+    "example": "run",
+    "note": "舌头卷起但不碰上颚"
+  },
+  {
+    "symbol": "/h/",
+    "example": "heat",
+    "note": "轻轻哈气"
+  },
+  {
+    "symbol": "/w/",
+    "example": "was",
+    "note": "圆唇"
+  },
+  {
+    "symbol": "/j/",
+    "example": "yes",
+    "note": "像“耶”的开头"
+  }
+]

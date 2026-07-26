@@ -1,26 +1,31 @@
-# Sites Worker ESM starter
+# 墨读 · Kindle 家庭阅读与英语学习站
 
-Use this starter for a static microsite, click counter, or simple internal UI whose state is browser-scoped. It has no dependencies and needs no install.
+面向 Kindle Paperwhite 旧版浏览器的服务器端多页面应用。核心页面不依赖 JavaScript；使用普通链接、HTML 表单、D1 数据库、R2 文件存储和服务器会话。
 
-Edit `worker/index.js`. Use the Sites checkpoint when a coherent milestone is ready to inspect or share; the remote builder then runs the checked-in build and validation scripts. Do not run them as a normal pre-checkpoint step.
+## 使用入口
 
-The build copies only `worker/index.js` and `.openai/hosting.json`. Do not add standalone asset files. Embed any essential raster bytes in `worker/index.js` and serve or reference them as a data URL.
+- Kindle：`/k`。首次打开会自动建立设备会话，输入 1–20 个字符的昵称即可开始。
+- 家长后台：`/admin`。通过 ChatGPT 登录，并受 `ADMIN_EMAILS` 白名单限制。
+- 兼容测试：`/device-test`。
 
-For targeted diagnosis after a remote build failure, the same commands are available in the Sites Linux environment:
+同一台 Kindle 可切换多个使用者。阅读进度、字号、学习计划、练习会话、答题、错题和掌握状态全部按 `user_id` 保存。
 
-```sh
-bash scripts/build.sh
-node scripts/validate-artifact.mjs
-```
+## 已实现
 
-The deterministic build produces:
+- 昆明服务器时间、Open-Meteo 自动天气、30 分钟缓存及手动备用天气。
+- TXT/Markdown 上传或粘贴、服务器章节识别、三档服务器分页、发布/下架、目录、翻页和个人进度。
+- 新版 PEP 七册目录结构与六年级下册空结构；六年级上册按用户提供材料导入首批已审核词汇、词组、语法和拼读内容。
+- 13 种练习题型、逐题服务器判分、防重复提交、错题复习、连续三次答对后的暂时掌握状态。
+- 家长使用者管理、独立删除确认、学习计划、知识库筛选和审核、CSV/JSON 服务器导入、报告、CSV/JSON 导出、设备和天气管理。
 
-```text
-dist/
-├── .openai/
-│   └── hosting.json
-└── server/
-    └── index.js
-```
+只有 `verified` 内容进入正式练习。自动生成的问题保持 `pending`，六年级下册未编造正式内容。
 
-`dist/server/index.js` is an ES module with a default export containing `fetch(request, env, ctx)`. Edit `worker/index.js`, not the generated file under `dist/`.
+## 数据与迁移
+
+- D1 迁移：`drizzle/`
+- 正式数据文件：`data/pep-new/`
+- Worker 源码：`worker/index.js`
+- D1 绑定名：`DB`
+- R2 绑定名：`BUCKET`
+
+环境变量见 `.env.example`。生产环境至少配置 `ADMIN_EMAILS`、`SESSION_SECRET`、`CSRF_SECRET` 和 `DEVICE_TOKEN_SECRET`。
