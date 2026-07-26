@@ -211,12 +211,7 @@ async function requireAdmin(request, env) {
   const identity = await adminIdentity(request, env);
   if (!identity) {
     return {
-      response: errorPage(
-        403,
-        "无权访问管理后台",
-        "请通过站点所有者账号进入，或由站点所有者将你的邮箱加入管理员名单。",
-        '<a href="/k">返回 Kindle 入口</a>',
-      ),
+      response: redirect(`/signin-with-chatgpt?return_to=${encodeURIComponent(new URL(request.url).pathname)}`),
     };
   }
   return { identity };
@@ -297,7 +292,7 @@ async function weatherBlock(env) {
     <p>昆明　${escapeHtml(weather.condition)}　${escapeHtml(weather.current)}℃<br>
     最高 ${escapeHtml(weather.high)}℃ / 最低 ${escapeHtml(weather.low)}℃<br>
     ${escapeHtml(weather.rain)}</p>
-    <p class="muted">天气更新时间：${escapeHtml(weather.updated)}<br>兼容验证阶段使用服务器备用天气。</p>
+    <p class="muted">天气更新时间：${escapeHtml(weather.updated)}</p>
   </section>`;
 }
 
@@ -310,6 +305,43 @@ function deviceRequiredPage() {
       <p class="muted">设备令牌只用于识别 Kindle，不会赋予管理权限。</p>`,
     nav: '<a href="/admin/devices">家长设备管理</a>',
   }));
+}
+
+async function createAutomaticDeviceSession(request, env, url) {
+  if (url.searchParams.get("session_check") === "1") {
+    return errorPage(
+      409,
+      "需要启用 Cookie",
+      "浏览器没有保存设备会话。请在 Kindle 浏览器设置中允许 Cookie，然后重试。",
+      '<a href="/k">重试</a> | <a href="/device-test">设备兼容性测试</a>',
+    );
+  }
+  const household = await env.DB.prepare(`
+    SELECT id FROM households WHERE status = 'active' ORDER BY created_at LIMIT 1
+  `).first();
+  if (!household) return errorPage(500, "家庭数据缺失", "数据库初始化尚未完成，请稍后重试。");
+
+  const userAgent = request.headers.get("user-agent") || "";
+  const deviceId = crypto.randomUUID();
+  const sessionId = crypto.randomUUID();
+  const sessionToken = randomToken();
+  const sessionHash = await sha256(sessionToken);
+  const csrfToken = randomToken(24);
+  const deviceName = /kindle|silk/i.test(userAgent) ? "Kindle 自动设备" : "浏览器测试设备";
+  await env.DB.batch([
+    env.DB.prepare(`
+      INSERT INTO devices
+        (id, household_id, name, model, firmware_version, token_hash, token_hint, status,
+         last_seen_at, created_at, updated_at)
+      VALUES (?, ?, ?, NULL, NULL, NULL, NULL, 'active', datetime('now'), datetime('now'), datetime('now'))
+    `).bind(deviceId, household.id, deviceName),
+    env.DB.prepare(`
+      INSERT INTO device_sessions
+        (id, device_id, session_token_hash, csrf_token, current_user_id, expires_at, created_at, updated_at)
+      VALUES (?, ?, ?, ?, NULL, datetime('now', '+180 days'), datetime('now'), datetime('now'))
+    `).bind(sessionId, deviceId, sessionHash, csrfToken),
+  ]);
+  return redirect("/k?session_check=1", { "set-cookie": deviceCookie(sessionToken) });
 }
 
 async function setupDevice(request, env, url) {
@@ -381,14 +413,14 @@ async function usersPage(request, env, url, session) {
     body: `${weather}
       ${notice ? `<div class="notice">${escapeHtml(notice)}</div>` : ""}
       <h1>请选择使用者</h1>
-      ${userButtons || '<p class="warning">还没有使用者，请先创建一个昵称。</p>'}
+      ${userButtons || '<p>第一次使用，请在下面输入一个昵称。</p>'}
       ${paging ? `<p>${paging}</p>` : ""}
-      <h2>新增使用者</h2>
+      <h2>${userButtons ? "新增使用者" : "输入昵称，开始使用"}</h2>
       <form method="post" action="/k/users/new">
         <input type="hidden" name="csrf_token" value="${escapeHtml(session.csrf_token)}">
         <label for="display_name">昵称（1 至 20 个字符）</label>
         <input id="display_name" name="display_name" type="text" maxlength="20" autocomplete="off" required>
-        <input type="submit" value="创建并进入">
+        <input type="submit" value="进入墨读">
       </form>`,
     nav: '<a href="/device-test">设备测试</a> | <a href="/admin">家长后台</a>',
   }));
@@ -499,8 +531,8 @@ function placeholderPage(user, kind) {
     body: `<div class="current-user">当前使用者：${escapeHtml(user.display_name)}</div>
       <h1>${isBooks ? "小说书架" : `${escapeHtml(user.display_name)}的英语学习`}</h1>
       <div class="warning">
-        <strong>${isBooks ? "小说系统将在第二阶段接入。" : "正式英语知识库将在第三阶段审核后接入。"}</strong>
-        <p>当前兼容验证版不会用少量演示内容代替正式数据。</p>
+        <strong>${isBooks ? "书架目前是空的。" : "正式教材内容正在按审核状态预装。"}</strong>
+        <p>${isBooks ? "家长上传并发布小说后，就会显示在这里。" : "不会使用少量演示词汇冒充七册正式知识库。"}</p>
       </div>
       ${isBooks ? "" : `<div class="card"><h2>默认学习计划</h2><p>新单词：10<br>复习单词：20<br>固定搭配：5<br>语法题：5</p></div>`}`,
     nav: `<a href="/k/home">个人主页</a> | <a href="/k/switch-user">切换使用者</a>`,
@@ -911,7 +943,7 @@ async function routeAdmin(request, env, url) {
 async function routeKindle(request, env, url) {
   if (url.pathname === "/k/setup" && request.method === "GET") return setupDevice(request, env, url);
   const session = await getDeviceSession(request, env);
-  if (!session || session.device_status !== "active") return deviceRequiredPage();
+  if (!session || session.device_status !== "active") return createAutomaticDeviceSession(request, env, url);
   const user = await getCurrentUser(session, env);
 
   if (url.pathname === "/k" && request.method === "GET") return usersPage(request, env, url, session);
