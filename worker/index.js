@@ -380,13 +380,14 @@ async function weatherBlock(env) {
     high: "25",
     low: "17",
     rain: "降雨概率 30%",
-    updated: "模拟数据",
+    updated: "备用天气",
+    stale: true,
   };
   if (automatic) {
     weather = automatic;
   } else if (row?.value) {
     try {
-      weather = { ...weather, ...JSON.parse(row.value), updated: row.updated_at || "手动录入" };
+      weather = { ...weather, ...JSON.parse(row.value), updated: row.updated_at || "手动录入", stale: false };
     } catch {
       // Keep safe fallback.
     }
