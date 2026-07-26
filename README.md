@@ -5,7 +5,7 @@
 ## 使用入口
 
 - Kindle：`/k`。首次打开会自动建立设备会话，输入 1–20 个字符的昵称即可开始。
-- 家长后台：`/admin`。通过 ChatGPT 登录，并受 `ADMIN_EMAILS` 白名单限制。
+- 家长后台：`/admin`。使用固定家长账号登录，与 Kindle 使用者昵称相互独立。
 - 兼容测试：`/device-test`。
 
 同一台 Kindle 可切换多个使用者。阅读进度、字号、学习计划、练习会话、答题、错题和掌握状态全部按 `user_id` 保存。
@@ -28,4 +28,4 @@
 - D1 绑定名：`DB`
 - R2 绑定名：`BUCKET`
 
-环境变量见 `.env.example`。生产环境至少配置 `ADMIN_EMAILS`、`SESSION_SECRET`、`CSRF_SECRET` 和 `DEVICE_TOKEN_SECRET`。
+环境变量见 `.env.example`。生产环境至少配置 `SESSION_SECRET`、`CSRF_SECRET` 和 `DEVICE_TOKEN_SECRET`。

@@ -1,7 +1,10 @@
 const COOKIE_DEVICE = "modu_device_session";
+const COOKIE_ADMIN = "modu_admin_session";
 const COOKIE_TEST = "modu_cookie_test";
 const COOKIE_TEST_CSRF = "modu_test_csrf";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 180;
+const ADMIN_USERNAME = "admin";
+const ADMIN_PASSWORD = "090709";
 const NO_STORE = {
   "cache-control": "private, no-store, max-age=0",
   "content-type": "text/html; charset=utf-8",
@@ -111,39 +114,44 @@ function learningStreak(dateRows) {
 function baseStyles() {
   return `
     html { background: #fff; color: #000; font-family: Arial, "Microsoft YaHei", sans-serif; }
-    body { margin: 0; background: #fff; color: #000; font-size: 23px; line-height: 1.55; }
-    main { box-sizing: border-box; width: 100%; max-width: 720px; margin: 0 auto; padding: 22px 18px 36px; }
-    h1 { margin: 0 0 22px; font-size: 32px; line-height: 1.25; }
-    h2 { margin: 28px 0 14px; font-size: 28px; line-height: 1.3; }
-    h3 { margin: 24px 0 10px; font-size: 24px; }
-    p { margin: 12px 0; }
+    body { margin: 0; background: #fff; color: #000; font-size: 28px; line-height: 1.62; }
+    main { box-sizing: border-box; width: 100%; max-width: 760px; margin: 0 auto; padding: 26px 20px 44px; }
+    h1 { margin: 0 0 26px; font-size: 38px; line-height: 1.28; }
+    h2 { margin: 32px 0 16px; font-size: 33px; line-height: 1.34; }
+    h3 { margin: 28px 0 12px; font-size: 29px; }
+    p { margin: 15px 0; }
     a { color: #000; text-decoration: underline; text-underline-offset: 3px; }
-    .brand { border-bottom: 4px solid #000; margin-bottom: 20px; padding-bottom: 12px; }
-    .brand strong { display: block; font-size: 27px; letter-spacing: .05em; }
-    .muted { color: #444; font-size: 19px; }
+    .brand { border-bottom: 5px solid #000; margin-bottom: 26px; padding-bottom: 16px; text-align: center; }
+    .brand strong { display: block; font-size: 36px; letter-spacing: .08em; }
+    .brand .muted { display: block; margin-top: 5px; }
+    .muted { color: #333; font-size: 23px; }
     .notice { border: 3px solid #000; margin: 18px 0; padding: 12px 14px; font-weight: bold; }
     .warning { border: 3px double #000; margin: 18px 0; padding: 12px 14px; }
-    .card { border: 3px solid #000; margin: 16px 0; padding: 16px; background: #fff; }
+    .card { border: 4px solid #000; margin: 20px 0; padding: 20px; background: #fff; }
+    .weather-panel { border: 4px solid #000; margin: 0 0 30px; padding: 20px 16px; text-align: center; font-size: 31px; line-height: 1.48; }
+    .weather-time { display: block; margin: 0 0 12px; font-size: 36px; line-height: 1.35; }
+    .weather-icon { font-family: Arial, "Microsoft YaHei", sans-serif; font-size: 62px; line-height: 1; margin: 6px 0 12px; }
+    .weather-place { font-size: 33px; font-weight: bold; }
     .button, button, input[type="submit"] {
-      box-sizing: border-box; display: block; width: 100%; min-height: 72px; margin: 14px 0;
+      box-sizing: border-box; display: block; width: 100%; min-height: 82px; margin: 17px 0;
       border: 4px solid #000; border-radius: 0; background: #fff; color: #000;
-      font: bold 24px/1.25 Arial, "Microsoft YaHei", sans-serif; text-align: center;
-      text-decoration: none; padding: 18px 12px; cursor: pointer;
+      font: bold 28px/1.3 Arial, "Microsoft YaHei", sans-serif; text-align: center;
+      text-decoration: none; padding: 20px 14px; cursor: pointer;
     }
     button:active, input[type="submit"]:active, .button:active { color: #fff; background: #000; }
     input[type="text"], input[type="password"], input[type="number"], textarea, select {
-      box-sizing: border-box; width: 100%; min-height: 58px; border: 3px solid #000;
-      border-radius: 0; background: #fff; color: #000; font: 23px/1.4 Arial, "Microsoft YaHei", sans-serif;
-      padding: 10px 12px;
+      box-sizing: border-box; width: 100%; min-height: 66px; border: 3px solid #000;
+      border-radius: 0; background: #fff; color: #000; font: 27px/1.45 Arial, "Microsoft YaHei", sans-serif;
+      padding: 12px 14px;
     }
     label { display: block; margin-top: 16px; font-weight: bold; }
     fieldset { border: 3px solid #000; margin: 18px 0; padding: 12px; }
     legend { padding: 0 8px; font-weight: bold; }
-    .radio-line { display: block; min-height: 48px; padding: 10px 2px; font-weight: normal; }
-    input[type="radio"], input[type="checkbox"] { width: 28px; height: 28px; vertical-align: middle; }
+    .radio-line { display: block; min-height: 56px; padding: 12px 2px; font-weight: normal; }
+    input[type="radio"], input[type="checkbox"] { width: 32px; height: 32px; vertical-align: middle; }
     nav { border-top: 3px solid #000; margin-top: 30px; padding-top: 18px; line-height: 2; }
-    table { width: 100%; border-collapse: collapse; font-size: 19px; }
-    th, td { border: 2px solid #000; padding: 8px; text-align: left; vertical-align: top; }
+    table { width: 100%; border-collapse: collapse; font-size: 22px; }
+    th, td { border: 2px solid #000; padding: 10px; text-align: left; vertical-align: top; }
     th { background: #eee; }
     .line-thin { border-top: 1px solid #000; margin: 14px 0; }
     .line-thick { border-top: 5px solid #000; margin: 14px 0; }
@@ -152,17 +160,20 @@ function baseStyles() {
     .gray-3 { background: #777; color: #fff; padding: 8px; }
     .current-user { border: 2px solid #000; margin: 12px 0; padding: 7px 10px; font-weight: bold; }
     .compact-form { margin: 0; }
-    .compact-form button { min-height: 58px; margin: 8px 0; font-size: 21px; padding: 12px; }
-    .admin main { max-width: 1000px; font-size: 18px; }
-    .admin .button, .admin button, .admin input[type="submit"] { min-height: 54px; font-size: 19px; padding: 12px; }
-    .admin input[type="text"], .admin textarea, .admin select { min-height: 48px; font-size: 18px; }
-    .admin-nav { border: 3px solid #000; padding: 10px 14px; line-height: 2.1; }
+    .compact-form button { min-height: 64px; margin: 10px 0; font-size: 23px; padding: 14px; }
+    .admin main { max-width: 1080px; font-size: 23px; }
+    .admin .button, .admin button, .admin input[type="submit"] { min-height: 64px; font-size: 23px; padding: 15px; }
+    .admin input[type="text"], .admin input[type="password"], .admin input[type="number"], .admin textarea, .admin select { min-height: 58px; font-size: 23px; }
+    .admin-nav { border: 3px solid #000; padding: 12px 16px; line-height: 2.2; }
     code { font-family: "Courier New", monospace; font-size: .9em; overflow-wrap: anywhere; }
     @media (max-width: 480px) {
-      body { font-size: 22px; }
-      main { padding: 18px 13px 30px; }
-      h1 { font-size: 30px; }
-      .admin table { font-size: 16px; }
+      body { font-size: 27px; }
+      main { padding: 20px 14px 36px; }
+      h1 { font-size: 36px; }
+      h2 { font-size: 31px; }
+      .weather-time { font-size: 34px; }
+      .weather-place { font-size: 31px; }
+      .admin table { font-size: 19px; }
     }
   `;
 }
@@ -214,19 +225,18 @@ function adminNavigation() {
     <a href="/admin/backup">备份</a> |
     <a href="/admin/devices">设备</a> |
     <a href="/admin/weather">天气</a> |
-    <a href="/device-test">设备测试</a>
+    <a href="/device-test">设备测试</a> |
+    <a href="/admin/logout">退出登录</a>
   </div>`;
 }
 
 async function adminIdentity(request, env) {
-  const email = (request.headers.get("oai-authenticated-user-email") || "").trim().toLowerCase();
-  if (!email) return null;
-  const allowlist = String(env.ADMIN_EMAILS || "")
-    .split(",")
-    .map((item) => item.trim().toLowerCase())
-    .filter(Boolean);
-  if (allowlist.length && !allowlist.includes(email)) return null;
-  return { email };
+  const secret = env.SESSION_SECRET;
+  if (!secret) return null;
+  const actual = parseCookies(request)[COOKIE_ADMIN] || "";
+  const expected = await hmac(secret, "fixed-admin-session:v1");
+  if (!safeEqual(actual, expected)) return null;
+  return { email: ADMIN_USERNAME, username: ADMIN_USERNAME };
 }
 
 async function adminCsrf(identity, env) {
@@ -238,11 +248,57 @@ async function adminCsrf(identity, env) {
 async function requireAdmin(request, env) {
   const identity = await adminIdentity(request, env);
   if (!identity) {
+    const pathname = new URL(request.url).pathname;
     return {
-      response: redirect(`/signin-with-chatgpt?return_to=${encodeURIComponent(new URL(request.url).pathname)}`),
+      response: redirect(`/admin/login?return_to=${encodeURIComponent(pathname)}`),
     };
   }
   return { identity };
+}
+
+async function adminLogin(request, env, url) {
+  const secret = env.CSRF_SECRET || env.SESSION_SECRET;
+  if (!secret || !env.SESSION_SECRET) return errorPage(500, "系统设置未完成", "管理员登录密钥尚未配置。");
+  const loginCsrf = await hmac(secret, "fixed-admin-login:v1");
+  const returnToRaw = String(url.searchParams.get("return_to") || "/admin");
+  const returnTo = returnToRaw.startsWith("/admin") && !returnToRaw.startsWith("//") ? returnToRaw : "/admin";
+  if (request.method === "POST") {
+    const form = await request.formData();
+    if (!safeEqual(String(form.get("csrf_token") || ""), loginCsrf)) {
+      return errorPage(403, "登录表单已过期", "请返回管理员登录页后重试。", '<a href="/admin/login">返回登录</a>');
+    }
+    const username = String(form.get("username") || "");
+    const password = String(form.get("password") || "");
+    if (!safeEqual(username, ADMIN_USERNAME) || !safeEqual(password, ADMIN_PASSWORD)) {
+      return redirect(`/admin/login?error=1&return_to=${encodeURIComponent(returnTo)}`);
+    }
+    const sessionToken = await hmac(env.SESSION_SECRET, "fixed-admin-session:v1");
+    return redirect(returnTo, {
+      "set-cookie": `${COOKIE_ADMIN}=${encodeURIComponent(sessionToken)}; Path=/admin; Max-Age=${60 * 60 * 24 * 30}; HttpOnly; Secure; SameSite=Strict`,
+    });
+  }
+  return htmlResponse(layout({
+    title: "家长后台登录",
+    admin: true,
+    body: `<h1>家长后台登录</h1>
+      ${url.searchParams.get("error") === "1" ? '<div class="warning">用户名或密码错误，请重新输入。</div>' : ""}
+      <form method="post" action="/admin/login?return_to=${encodeURIComponent(returnTo)}">
+        <input type="hidden" name="csrf_token" value="${escapeHtml(loginCsrf)}">
+        <label for="username">用户名</label>
+        <input id="username" name="username" type="text" value="admin" autocomplete="username" required>
+        <label for="password">密码</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <input type="submit" value="登录家长后台">
+      </form>
+      <p class="muted">家长后台与 Kindle 使用者昵称相互独立。</p>`,
+    nav: '<a href="/k">返回 Kindle 入口</a>',
+  }));
+}
+
+function adminLogout() {
+  return redirect("/admin/login", {
+    "set-cookie": `${COOKIE_ADMIN}=; Path=/admin; Max-Age=0; HttpOnly; Secure; SameSite=Strict`,
+  });
 }
 
 async function requireAdminPost(request, env, form) {
@@ -313,6 +369,17 @@ function weatherCodeText(code) {
     80: "阵雨", 81: "较强阵雨", 82: "强阵雨", 95: "雷雨", 96: "雷雨伴冰雹", 99: "强雷雨伴冰雹",
   };
   return map[Number(code)] || "天气情况未知";
+}
+
+function weatherSymbol(condition) {
+  const text = String(condition || "");
+  if (/雷/u.test(text)) return "⚡";
+  if (/雪|冰/u.test(text)) return "❄";
+  if (/雨/u.test(text)) return "☂";
+  if (/雾/u.test(text)) return "≋";
+  if (/晴/u.test(text) && !/云/u.test(text)) return "☀";
+  if (/云|阴/u.test(text)) return "☁";
+  return "◯";
 }
 
 async function fetchAutomaticWeather(env, force = false) {
@@ -392,9 +459,12 @@ async function weatherBlock(env) {
       // Keep safe fallback.
     }
   }
-  return `<section aria-label="昆明时间和天气">
-    <p><strong>${escapeHtml(kunmingNow())}</strong></p>
-    <p>昆明　${escapeHtml(weather.condition)}　${escapeHtml(weather.current)}℃<br>
+  const symbol = weatherSymbol(weather.condition);
+  return `<section class="weather-panel" aria-label="昆明时间和天气">
+    <strong class="weather-time">${escapeHtml(kunmingNow())}</strong>
+    <div class="weather-icon" role="img" aria-label="${escapeHtml(weather.condition)}">${escapeHtml(symbol)}</div>
+    <p class="weather-place">昆明　${escapeHtml(weather.condition)}　${escapeHtml(weather.current)}℃</p>
+    <p>
     最高 ${escapeHtml(weather.high)}℃ / 最低 ${escapeHtml(weather.low)}℃<br>
     ${escapeHtml(weather.rain)}</p>
     <p class="muted">天气更新时间：${escapeHtml(weather.updated)}${weather.stale ? "（天气数据暂未更新，显示最近成功数据）" : ""}</p>
@@ -793,6 +863,7 @@ function deviceTestMeta() {
 
 async function adminDashboard(request, env, identity) {
   const csrf = await adminCsrf(identity, env);
+  const weather = await weatherBlock(env);
   const counts = await env.DB.prepare(`
     SELECT
       (SELECT COUNT(*) FROM users WHERE status = 'active') AS users,
@@ -806,6 +877,7 @@ async function adminDashboard(request, env, identity) {
     body: `${adminNavigation()}
       <h1>家长管理后台</h1>
       <p class="muted">当前管理员：${escapeHtml(identity.email)}</p>
+      ${weather}
       ${csrf ? "" : '<div class="warning">管理表单密钥尚未配置，写操作暂时不可用。</div>'}
       <div class="card"><h2>系统状态</h2>
         <p>活跃使用者：${Number(counts?.users || 0)}<br>
@@ -1969,7 +2041,7 @@ async function adminNewBook(request, env, identity) {
         (id, book_id, title, body, sort_order, parsing_warnings, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
     `).bind(chapterId, bookId, chapter.title, chapter.body, index + 1, chapter.warning || null));
-    for (const [fontSize, target] of [["small", 1050], ["medium", 760], ["large", 540]]) {
+    for (const [fontSize, target] of [["small", 760], ["medium", 560], ["large", 400]]) {
       const pages = paginateChapter(chapter.body, target);
       if (fontSize === "medium") totalPages += pages.length;
       pages.forEach((pageBody, pageIndex) => statements.push(env.DB.prepare(`
@@ -2101,7 +2173,7 @@ async function adminChapterEdit(request, env, identity, chapterId) {
       .bind(title, body, sortOrder, chapterId),
     env.DB.prepare(`DELETE FROM chapter_pages WHERE chapter_id = ?`).bind(chapterId),
   ];
-  for (const [fontSize, target] of [["small", 1050], ["medium", 760], ["large", 540]]) {
+  for (const [fontSize, target] of [["small", 760], ["medium", 560], ["large", 400]]) {
     paginateChapter(body, target).forEach((pageBody, pageIndex) => statements.push(env.DB.prepare(`
       INSERT INTO chapter_pages (id, chapter_id, font_size, page_number, body, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))
@@ -2203,7 +2275,7 @@ async function kindleRead(env, user, session, bookId, chapterId, pageNumber) {
     body: `<div class="current-user">当前使用者：${escapeHtml(user.display_name)}</div>
       <p class="muted">${escapeHtml(row.book_title)}</p>
       <h1>${escapeHtml(row.chapter_title)}</h1>
-      <article style="font-family:Georgia,'Times New Roman',serif;font-size:${fontSize === "small" ? "24" : fontSize === "large" ? "28" : "26"}px;line-height:1.75">${novelParagraphs(row.body)}</article>
+      <article style="font-family:Georgia,'Times New Roman',serif;font-size:${fontSize === "small" ? "28" : fontSize === "large" ? "36" : "32"}px;line-height:1.72">${novelParagraphs(row.body)}</article>
       <p class="muted">本章第 ${Number(row.page_number)} / ${Number(row.chapter_pages)} 页　全书约 ${progress}%</p>`,
     nav: `${prevPage ? `<a href="${escapeHtml(prevPage)}">上一页</a>` : "上一页"} | <a href="/k/book/${escapeHtml(bookId)}">目录</a> | ${nextPage ? `<a href="${escapeHtml(nextPage)}">下一页</a>` : "下一页"} | <a href="/k/home">个人主页</a> | <a href="/k/switch-user">切换使用者</a>`,
   }));
@@ -2568,6 +2640,8 @@ async function kindleRecords(env, user) {
 }
 
 async function routeAdmin(request, env, url) {
+  if (url.pathname === "/admin/login" && ["GET", "POST"].includes(request.method)) return adminLogin(request, env, url);
+  if (url.pathname === "/admin/logout" && request.method === "GET") return adminLogout();
   const admin = await requireAdmin(request, env);
   if (admin.response) return admin.response;
   const path = url.pathname;
