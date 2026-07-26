@@ -1,0 +1,10 @@
+{
+  "name": "modu-kindle-reading",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bash scripts/build.sh",
+    "validate": "node scripts/validate-artifact.mjs"
+  },
+  "displayName": "\u58a8\u8bfb \u00b7 Kindle \u5bb6\u5ead\u9605\u8bfb\u4e0e\u82f1\u8bed\u5b66\u4e60\u7ad9"
+}
