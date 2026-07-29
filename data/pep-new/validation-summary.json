@@ -1,0 +1,13 @@
+{
+  "units": 54,
+  "g6_vocabulary_rows": 145,
+  "g6_unique_lemmas": 144,
+  "g6_phrases": 57,
+  "g6_phonics": 44,
+  "g6_grammar": 6,
+  "verified_manual_questions": 30,
+  "verified_question_types": 13,
+  "pending_generated_questions": 347,
+  "formal_practice_rule": "only_verified",
+  "note": "三上至五下已建立同一新版 PEP 官方目录和待审核正式数据结构；六上使用用户提供材料导入首批已审核内容；六下仅保留空结构，未编造内容。"
+}

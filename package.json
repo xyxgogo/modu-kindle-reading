@@ -1,0 +1,17 @@
+{
+  "name": "modu-kindle-reading",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "check": "node --check worker/index.js && node --check netlify/functions/app.mjs && node scripts/validate-local.mjs",
+    "build": "node scripts/prepare-netlify.mjs"
+  },
+  "displayName": "\u58a8\u8bfb \u00b7 Kindle \u5bb6\u5ead\u9605\u8bfb\u4e0e\u5355\u8bcd\u5b66\u4e60\u7ad9",
+  "dependencies": {
+    "@netlify/blobs": "^10.7.10"
+  },
+  "devDependencies": {
+    "netlify-cli": "^27.0.1"
+  }
+}

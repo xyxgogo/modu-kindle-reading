@@ -1,0 +1,21 @@
+[build]
+  command = "node scripts/prepare-netlify.mjs"
+  publish = "public"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+  external_node_modules = ["@netlify/blobs"]
+  included_files = [
+    "netlify/functions/_assets/**",
+    "drizzle/**"
+  ]
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/app"
+  status = 200
+  force = true

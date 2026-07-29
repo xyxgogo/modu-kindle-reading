@@ -1,0 +1,42 @@
+[
+  {
+    "unit_code": "Unit 1",
+    "title": "Pending Unit 1",
+    "is_revision": false,
+    "sort_order": 1,
+    "verification_status": "draft",
+    "source": "仅建立结构，未提供可靠正式数据"
+  },
+  {
+    "unit_code": "Unit 2",
+    "title": "Pending Unit 2",
+    "is_revision": false,
+    "sort_order": 2,
+    "verification_status": "draft",
+    "source": "仅建立结构，未提供可靠正式数据"
+  },
+  {
+    "unit_code": "Unit 3",
+    "title": "Pending Unit 3",
+    "is_revision": false,
+    "sort_order": 3,
+    "verification_status": "draft",
+    "source": "仅建立结构，未提供可靠正式数据"
+  },
+  {
+    "unit_code": "Unit 4",
+    "title": "Pending Unit 4",
+    "is_revision": false,
+    "sort_order": 4,
+    "verification_status": "draft",
+    "source": "仅建立结构，未提供可靠正式数据"
+  },
+  {
+    "unit_code": "Revision",
+    "title": "General Revision",
+    "is_revision": true,
+    "sort_order": 5,
+    "verification_status": "draft",
+    "source": "仅建立结构，未提供可靠正式数据"
+  }
+]

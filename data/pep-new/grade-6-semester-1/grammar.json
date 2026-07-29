@@ -1,0 +1,50 @@
+[
+  {
+    "unit": 1,
+    "name": "一般过去时：特殊疑问句",
+    "structure": "What/Where + did + 主语 + 动词原形?",
+    "usage": "询问已经发生的旅行和活动",
+    "example": "What did you do? I climbed the Great Wall.",
+    "common_error": "did 后面的动词要用原形。"
+  },
+  {
+    "unit": 2,
+    "name": "一般过去时：一般疑问句",
+    "structure": "Did + 主语 + 动词原形?",
+    "usage": "询问过去是否做过某事",
+    "example": "Did you eat mooncakes? Yes, we did.",
+    "common_error": "不要在 did 后继续使用过去式。"
+  },
+  {
+    "unit": 3,
+    "name": "should 提建议",
+    "structure": "主语 + should/shouldn’t + 动词原形",
+    "usage": "给出健康建议",
+    "example": "You should see a doctor.",
+    "common_error": "should 后使用动词原形。"
+  },
+  {
+    "unit": 4,
+    "name": "be going to 表示计划",
+    "structure": "主语 + be going to + 动词原形",
+    "usage": "说明将来的消费计划",
+    "example": "I am going to buy a schoolbag.",
+    "common_error": "根据主语选择 am/is/are。"
+  },
+  {
+    "unit": 5,
+    "name": "there be 句型",
+    "structure": "There is/are + 名词 + 地点",
+    "usage": "描述宇宙和自然中存在的事物",
+    "example": "There are many stars in the sky.",
+    "common_error": "单数用 is，复数用 are。"
+  },
+  {
+    "unit": 6,
+    "name": "情态动词与环保建议",
+    "structure": "主语 + should/can + 动词原形",
+    "usage": "表达节能和环保建议",
+    "example": "We should save water.",
+    "common_error": "情态动词后使用动词原形。"
+  }
+]

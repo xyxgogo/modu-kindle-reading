@@ -1,0 +1,14 @@
+[
+  {"unit":1,"type":"choice_en_zh","prompt":"选择 see 的中文意思。","options":["看见","跑","拍照","旅行"],"answer":"看见","explanation":"see 表示“看见”，过去式是 saw。","original":true,"verification_status":"verified"},
+  {"unit":1,"type":"choice_zh_en","prompt":"选择“去”的英文。","options":["go","see","take","run"],"answer":"go","explanation":"go 表示“去”，过去式是 went。","original":true,"verification_status":"verified"},
+  {"unit":1,"type":"spell_zh_en","prompt":"请完整拼写“拿；拍”的英文原形。","options":[],"answer":"take","explanation":"take 的过去式是 took。","original":true,"verification_status":"verified"},
+  {"unit":1,"type":"fill_zh","prompt":"请填写 energy 的中文意思。","options":[],"answer":"能源","explanation":"energy 表示“能源”。","original":true,"verification_status":"verified"},
+  {"unit":1,"type":"morphology","prompt":"填写 run 的一般过去式。","options":[],"answer":"ran","explanation":"run 是不规则动词，过去式为 ran。","original":true,"verification_status":"verified"},
+  {"unit":1,"type":"phrase_choice","prompt":"选择“拍照”的正确固定搭配。","options":["take photos","take books","see photos","run photos"],"answer":"take photos","explanation":"“拍照”使用固定搭配 take photos。","original":true,"verification_status":"verified"},
+  {"unit":3,"type":"sentence_fill","prompt":"You have a fever. You should ____ a doctor.","options":["see","saw","seeing","sees"],"answer":"see","explanation":"should 后面使用动词原形 see。","original":true,"verification_status":"verified"},
+  {"unit":3,"type":"zh_en","prompt":"把“你应该去看医生”翻译成英文。","options":[],"answer":"You should see a doctor.","explanation":"should 后接动词原形。","original":true,"verification_status":"verified"},
+  {"unit":1,"type":"en_zh","prompt":"把“I took many photos.”翻译成中文。","options":[],"answer":"我拍了很多照片。","explanation":"took photos 表示“拍了照片”。","original":true,"verification_status":"verified"},
+  {"unit":1,"type":"passage_fill","prompt":"短文填空：Last summer, I ____ to Xi’an with my family. We saw the Terracotta Warriors.","options":[],"answer":"went","explanation":"Last summer 表示过去时间，go 的过去式是 went。","original":true,"verification_status":"verified"},
+  {"unit":3,"type":"true_false","prompt":"判断正误：You should to see a doctor.","options":["正确","错误"],"answer":"错误","explanation":"should 后直接接动词原形，不加 to。","original":true,"verification_status":"verified"},
+  {"unit":1,"type":"sentence_correction","prompt":"改正句子：Where did you went last summer?","options":[],"answer":"Where did you go last summer?","explanation":"did 后面的动词应使用原形 go。","original":true,"verification_status":"verified"}
+]

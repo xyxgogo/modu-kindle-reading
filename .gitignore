@@ -1,0 +1,39 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+
+# Dependencies and package-manager caches
+node_modules/
+.pnpm-store/
+
+# Local and generated application data
+local-data/
+netlify/functions/_assets/
+*.sqlite
+*.sqlite-*
+*.db
+
+# Platform and build output
+.netlify/
+dist/
+coverage/
+.cache/
+.tmp/
+
+# Private migration/source archive
+archive/
+
+# Logs and language caches
+*.log
+__pycache__/
+*.py[cod]
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
