@@ -1,31 +1,58 @@
 # 墨读 · Kindle 家庭阅读与英语学习站
 
-面向 Kindle Paperwhite 旧版浏览器的服务器端多页面应用。核心页面不依赖 JavaScript；使用普通链接、HTML 表单、D1 数据库、R2 文件存储和服务器会话。
+这是从 ChatGPT Sites 项目完整拉取到本地的源码仓库，面向 Kindle Paperwhite 旧版浏览器。核心流程为服务器端多页面 HTML，不依赖 JavaScript；数据由 Cloudflare D1 保存，原始上传文件由 R2 保存。
 
-## 使用入口
+## 在线入口
 
-- Kindle：`/k`。首次打开会自动建立设备会话，输入 1–20 个字符的昵称即可开始。
-- 家长后台：`/admin`。使用固定家长账号登录，与 Kindle 使用者昵称相互独立。
-- 兼容测试：`/device-test`。
+- Kindle：[https://modu-kindle-reading.netlify.app/k](https://modu-kindle-reading.netlify.app/k)
+- 家长后台：[https://modu-kindle-reading.netlify.app/admin](https://modu-kindle-reading.netlify.app/admin)
+- 设备测试：[https://modu-kindle-reading.netlify.app/device-test](https://modu-kindle-reading.netlify.app/device-test)
+- Sites 主服务：[https://modu-kindle-reading.fangtuomashi990218.chatgpt.site](https://modu-kindle-reading.fangtuomashi990218.chatgpt.site)
 
-同一台 Kindle 可切换多个使用者。阅读进度、字号、学习计划、练习会话、答题、错题和掌握状态全部按 `user_id` 保存。
+Netlify 站点是面向用户的代理入口；完整应用、D1 数据库和 R2 文件仍运行在 Sites 主服务中。
 
-## 已实现
+## 本地查看与验证
 
-- 昆明服务器时间、Open-Meteo 自动天气、30 分钟缓存及手动备用天气。
-- TXT/Markdown 上传或粘贴、服务器章节识别、三档服务器分页、发布/下架、目录、翻页和个人进度。
-- 新版 PEP 七册目录结构与六年级下册空结构；六年级上册按用户提供材料导入首批已审核词汇、词组、语法和拼读内容。
-- 13 种练习题型、逐题服务器判分、防重复提交、错题复习、连续三次答对后的暂时掌握状态。
-- 家长使用者管理、独立删除确认、学习计划、知识库筛选和审核、CSV/JSON 服务器导入、报告、CSV/JSON 导出、设备和天气管理。
+要求 Node.js 18 或更高版本。仓库无第三方 npm 依赖。
 
-只有 `verified` 内容进入正式练习。自动生成的问题保持 `pending`，六年级下册未编造正式内容。
+```powershell
+npm run build
+npm run validate
+```
 
-## 数据与迁移
+构建会把 Worker 和 Sites 清单复制到 `dist/`，验证脚本会检查生成文件是有效 ESM，并确认导出了 `fetch` 处理器。完整本地运行仍需要 D1、R2 和 Sites 运行时绑定；仅克隆仓库不会复制生产密钥或远程存储。
 
-- D1 迁移：`drizzle/`
-- 正式数据文件：`data/pep-new/`
-- Worker 源码：`worker/index.js`
-- D1 绑定名：`DB`
-- R2 绑定名：`BUCKET`
+## 主要目录
 
-环境变量见 `.env.example`。生产环境至少配置 `SESSION_SECRET`、`CSRF_SECRET` 和 `DEVICE_TOKEN_SECRET`。
+- `worker/index.js`：完整应用、页面、路由、会话、后台和业务逻辑
+- `db/schema.ts`：数据库结构说明
+- `drizzle/`：D1 建库和种子迁移
+- `data/pep-new/`：PEP 教材目录、词汇、词组、拼读、语法及题库数据
+- `.openai/hosting.json`：Sites 项目标识和 D1/R2 绑定
+- `archive/chatgpt-share.html`：原始分享页快照
+- `archive/conversation.json`：完整解码后的会话数据
+- `archive/conversation.md`：按当前分支展开的可读会话
+- `archive/live-data/`：迁移时从线上后台导出的目录、答题和使用者记录
+- `docs/HANDOFF.md`：架构、部署与迁移交接说明
+
+## 已实现功能
+
+- Kindle 首次打开自动建立设备会话，输入昵称即可使用
+- 小说上传、章节识别、服务器分页、书架与独立阅读进度
+- 新版 PEP 教材结构、13 种题型、错题与掌握状态
+- 家长端使用者、计划、知识库、报告、导入导出、设备和天气管理
+- 昆明时间、自动天气与备用天气
+- 多使用者数据隔离、普通 HTML 表单、Cookie 与 CSRF 防护
+
+只允许 `verified` 内容进入正式练习；自动生成问题保持 `pending`，六年级下册仅保留未审核结构。
+
+## 配置
+
+环境变量模板见 `.env.example`。生产环境至少需要：
+
+- `SESSION_SECRET`
+- `CSRF_SECRET`
+- `DEVICE_TOKEN_SECRET`
+- 可选的 `WEATHER_API_BASE_URL` 和 `WEATHER_API_KEY`
+
+生产密钥没有写入仓库。当前后台固定账号逻辑位于 `worker/index.js`；若仓库将对外公开，应先改为环境变量并轮换现有凭据。

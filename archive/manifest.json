@@ -1,0 +1,35 @@
+{
+  "source_url": "https://chatgpt.com/share/6a69bf94-13dc-83ec-9c81-2b73f4a17e48",
+  "conversation_id": "6a69bf94-13dc-83ec-9c81-2b73f4a17e48",
+  "title": "墨读开发进展",
+  "captured_html": "chatgpt-share.html",
+  "reference_table_items": 7885,
+  "mapping_nodes": 293,
+  "selected_branch_nodes": 293,
+  "roles": {
+    "user": 6,
+    "assistant": 195,
+    "tool": 91
+  },
+  "content_types": {
+    "text": 174,
+    "model_editable_context": 1,
+    "thoughts": 71,
+    "code": 41,
+    "reasoning_recap": 5
+  },
+  "files": {
+    "chatgpt-share.html": {
+      "sha256": "b9692f6437792b2187df29cc12c159d25b0e2ee27f7c9171c3c2ca4594683e86",
+      "bytes": 917648
+    },
+    "conversation.json": {
+      "sha256": "edc42a959d93c9f8f2f1f80730f781ff35ef30015832891913b9251fe2c2ca23",
+      "bytes": 1368678
+    },
+    "conversation.md": {
+      "sha256": "d15f454b45abd4e11cef9085a3a943ac93775ed0b6abbc9208cb7073d37b6fc6",
+      "bytes": 167627
+    }
+  }
+}

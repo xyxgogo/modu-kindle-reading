@@ -3,8 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "bash scripts/build.sh",
-    "validate": "node scripts/validate-artifact.mjs"
+    "build": "node scripts/build.mjs",
+    "validate": "node scripts/validate-artifact.mjs",
+    "archive:chat": "python scripts/import_chatgpt_share.py archive/chatgpt-share.html --source-url https://chatgpt.com/share/6a69bf94-13dc-83ec-9c81-2b73f4a17e48"
   },
   "displayName": "\u58a8\u8bfb \u00b7 Kindle \u5bb6\u5ead\u9605\u8bfb\u4e0e\u82f1\u8bed\u5b66\u4e60\u7ad9"
 }

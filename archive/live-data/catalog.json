@@ -1,0 +1,466 @@
+{
+  "exported_at": "2026-07-29T09:16:03.035Z",
+  "textbooks": [
+    {
+      "id": "pep_new_g3_s1",
+      "grade": 3,
+      "semester": 1,
+      "data_source": "https://www.pep.com.cn/zslth/yyptzy/xypep/3s/",
+      "verification_status": "pending"
+    },
+    {
+      "id": "pep_new_g3_s2",
+      "grade": 3,
+      "semester": 2,
+      "data_source": "https://www.pep.com.cn/zslth/yyptzy/xypep/3x/",
+      "verification_status": "pending"
+    },
+    {
+      "id": "pep_new_g4_s1",
+      "grade": 4,
+      "semester": 1,
+      "data_source": "https://www.pep.com.cn/zslth/yyptzy/xypep/4s/",
+      "verification_status": "pending"
+    },
+    {
+      "id": "pep_new_g4_s2",
+      "grade": 4,
+      "semester": 2,
+      "data_source": "https://www.pep.com.cn/zslth/yyptzy/xypep/4x/",
+      "verification_status": "pending"
+    },
+    {
+      "id": "pep_new_g5_s1",
+      "grade": 5,
+      "semester": 1,
+      "data_source": "https://www.pep.com.cn/zslth/yyptzy/xypep/5s/",
+      "verification_status": "pending"
+    },
+    {
+      "id": "pep_new_g5_s2",
+      "grade": 5,
+      "semester": 2,
+      "data_source": "https://www.pep.com.cn/zslth/yyptzy/xypep/5x/",
+      "verification_status": "pending"
+    },
+    {
+      "id": "pep_new_g6_s1",
+      "grade": 6,
+      "semester": 1,
+      "data_source": "用户提供《六上人教英语新教材》PDF及六单元整理材料",
+      "verification_status": "verified"
+    },
+    {
+      "id": "pep_new_g6_s2",
+      "grade": 6,
+      "semester": 2,
+      "data_source": "仅建立册次记录，禁止在无可靠数据时标记已审核",
+      "verification_status": "draft"
+    }
+  ],
+  "units": [
+    {
+      "textbook_id": "pep_new_g3_s1",
+      "unit_code": "Unit 1",
+      "title": "Making friends",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g3_s1",
+      "unit_code": "Unit 2",
+      "title": "Different families",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g3_s1",
+      "unit_code": "Unit 3",
+      "title": "Amazing animals",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g3_s1",
+      "unit_code": "Unit 4",
+      "title": "Plants around us",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g3_s1",
+      "unit_code": "Unit 5",
+      "title": "The colourful world",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g3_s1",
+      "unit_code": "Unit 6",
+      "title": "Useful numbers",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g3_s1",
+      "unit_code": "Revision",
+      "title": "Being a good guest",
+      "is_revision": 1,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g3_s2",
+      "unit_code": "Unit 1",
+      "title": "Meeting new people",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g3_s2",
+      "unit_code": "Unit 2",
+      "title": "Expressing yourself",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g3_s2",
+      "unit_code": "Unit 3",
+      "title": "Learning better",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g3_s2",
+      "unit_code": "Unit 4",
+      "title": "Healthy food",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g3_s2",
+      "unit_code": "Unit 5",
+      "title": "Old toys",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g3_s2",
+      "unit_code": "Unit 6",
+      "title": "Numbers in life",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g3_s2",
+      "unit_code": "Revision",
+      "title": "Revision",
+      "is_revision": 1,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g4_s1",
+      "unit_code": "Unit 1",
+      "title": "Helping at home",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g4_s1",
+      "unit_code": "Unit 2",
+      "title": "My friends",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g4_s1",
+      "unit_code": "Unit 3",
+      "title": "Places we live in",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g4_s1",
+      "unit_code": "Unit 4",
+      "title": "Helping in the community",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g4_s1",
+      "unit_code": "Unit 5",
+      "title": "The weather and us",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g4_s1",
+      "unit_code": "Unit 6",
+      "title": "Changing for the seasons",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g4_s1",
+      "unit_code": "Revision",
+      "title": "Let’s help!",
+      "is_revision": 1,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g4_s2",
+      "unit_code": "Unit 1",
+      "title": "Class rules",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g4_s2",
+      "unit_code": "Unit 2",
+      "title": "Family rules",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g4_s2",
+      "unit_code": "Unit 3",
+      "title": "Time for school",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g4_s2",
+      "unit_code": "Unit 4",
+      "title": "Going shopping",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g4_s2",
+      "unit_code": "Unit 5",
+      "title": "Farms and us",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g4_s2",
+      "unit_code": "Unit 6",
+      "title": "From farm to table",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g4_s2",
+      "unit_code": "Revision",
+      "title": "A great weekend plan",
+      "is_revision": 1,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g5_s1",
+      "unit_code": "Unit 1",
+      "title": "Different friends",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g5_s1",
+      "unit_code": "Unit 2",
+      "title": "My feelings",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g5_s1",
+      "unit_code": "Unit 3",
+      "title": "Work and play",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g5_s1",
+      "unit_code": "Unit 4",
+      "title": "Healthy habits",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g5_s1",
+      "unit_code": "Unit 5",
+      "title": "Food we eat",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g5_s1",
+      "unit_code": "Unit 6",
+      "title": "Nature and us",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g5_s1",
+      "unit_code": "Revision",
+      "title": "New Year’s party",
+      "is_revision": 1,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g5_s2",
+      "unit_code": "Unit 1",
+      "title": "Following the rules",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g5_s2",
+      "unit_code": "Unit 2",
+      "title": "Our community",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g5_s2",
+      "unit_code": "Unit 3",
+      "title": "Life in different seasons",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g5_s2",
+      "unit_code": "Unit 4",
+      "title": "My hometown",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g5_s2",
+      "unit_code": "Unit 5",
+      "title": "Travelling around",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g5_s2",
+      "unit_code": "Unit 6",
+      "title": "Making a travel plan",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g5_s2",
+      "unit_code": "Revision",
+      "title": "Revision",
+      "is_revision": 1,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g6_s1",
+      "unit_code": "Unit 1",
+      "title": "Amazing landmarks",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g6_s1",
+      "unit_code": "Unit 2",
+      "title": "Getting together",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g6_s1",
+      "unit_code": "Unit 3",
+      "title": "Healthy life",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g6_s1",
+      "unit_code": "Unit 4",
+      "title": "Managing money well",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g6_s1",
+      "unit_code": "Unit 5",
+      "title": "Exploring space",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g6_s1",
+      "unit_code": "Unit 6",
+      "title": "Energy, nature and us",
+      "is_revision": 0,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g6_s1",
+      "unit_code": "Revision",
+      "title": "Revision",
+      "is_revision": 1,
+      "verification_status": "verified"
+    },
+    {
+      "textbook_id": "pep_new_g6_s2",
+      "unit_code": "Unit 1",
+      "title": "Pending Unit 1",
+      "is_revision": 0,
+      "verification_status": "draft"
+    },
+    {
+      "textbook_id": "pep_new_g6_s2",
+      "unit_code": "Unit 2",
+      "title": "Pending Unit 2",
+      "is_revision": 0,
+      "verification_status": "draft"
+    },
+    {
+      "textbook_id": "pep_new_g6_s2",
+      "unit_code": "Unit 3",
+      "title": "Pending Unit 3",
+      "is_revision": 0,
+      "verification_status": "draft"
+    },
+    {
+      "textbook_id": "pep_new_g6_s2",
+      "unit_code": "Unit 4",
+      "title": "Pending Unit 4",
+      "is_revision": 0,
+      "verification_status": "draft"
+    },
+    {
+      "textbook_id": "pep_new_g6_s2",
+      "unit_code": "Revision",
+      "title": "General Revision",
+      "is_revision": 1,
+      "verification_status": "draft"
+    }
+  ],
+  "books": [
+    {
+      "id": "bd698188-e103-43a3-8e6a-9164d4c5f54e",
+      "title": "Kindle 墨水屏上的一天",
+      "author": "墨读项目组",
+      "status": "published",
+      "total_chapters": 3,
+      "total_pages": 3
+    },
+    {
+      "id": "7439fe17-2b61-4dfd-b4bc-92183d5bd70a",
+      "title": "失落的文字之城",
+      "author": "子木爸爸",
+      "status": "published",
+      "total_chapters": 9,
+      "total_pages": 36
+    }
+  ],
+  "content_counts": {
+    "vocabulary": 144,
+    "phrases": 57,
+    "grammar": 6,
+    "phonics": 44,
+    "questions": 377
+  }
+}
