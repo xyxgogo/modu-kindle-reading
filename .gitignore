@@ -3,3 +3,6 @@ site.tar.gz
 .env
 .DS_Store
 __pycache__/
+local-data/
+dev-server.log
+dev-server.err.log

@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "node scripts/dev-server.mjs",
     "build": "node scripts/build.mjs",
     "validate": "node scripts/validate-artifact.mjs",
     "archive:chat": "python scripts/import_chatgpt_share.py archive/chatgpt-share.html --source-url https://chatgpt.com/share/6a69bf94-13dc-83ec-9c81-2b73f4a17e48"

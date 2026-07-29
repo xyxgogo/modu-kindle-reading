@@ -16,9 +16,12 @@ Netlify 站点是面向用户的代理入口；完整应用、D1 数据库和 R2
 要求 Node.js 18 或更高版本。仓库无第三方 npm 依赖。
 
 ```powershell
+npm run dev
 npm run build
 npm run validate
 ```
+
+本地开发地址默认为 `http://localhost:8787/k`。首次运行会在 `local-data/` 创建独立的 SQLite 数据库和本地 R2 文件目录，不会连接或修改线上生产数据。
 
 构建会把 Worker 和 Sites 清单复制到 `dist/`，验证脚本会检查生成文件是有效 ESM，并确认导出了 `fetch` 处理器。完整本地运行仍需要 D1、R2 和 Sites 运行时绑定；仅克隆仓库不会复制生产密钥或远程存储。
 
