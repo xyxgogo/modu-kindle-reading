@@ -1,61 +1,70 @@
-# 墨读 · Kindle 家庭阅读与英语学习站
+# 墨读 v2
 
-这是从 ChatGPT Sites 项目完整拉取到本地的源码仓库，面向 Kindle Paperwhite 旧版浏览器。核心流程为服务器端多页面 HTML，不依赖 JavaScript；数据由 Cloudflare D1 保存，原始上传文件由 R2 保存。
+墨读是一套 Kindle 优先的家庭轻量学习与阅读产品。它让闲置 Kindle 重新成为安静、护眼的家庭阅读器和英语学习终端。
 
-## 在线入口
+正式站点：[https://modu.1005205.xyz](https://modu.1005205.xyz)
 
-- Kindle：[https://modu-kindle-reading.netlify.app/k](https://modu-kindle-reading.netlify.app/k)
-- 家长后台：[https://modu-kindle-reading.netlify.app/admin](https://modu-kindle-reading.netlify.app/admin)
-- 设备测试：[https://modu-kindle-reading.netlify.app/device-test](https://modu-kindle-reading.netlify.app/device-test)
-- Sites 主服务：[https://modu-kindle-reading.fangtuomashi990218.chatgpt.site](https://modu-kindle-reading.fangtuomashi990218.chatgpt.site)
+## 产品能力
 
-Netlify 站点是面向用户的代理入口；完整应用、D1 数据库和 R2 文件仍运行在 Sites 主服务中。
+- Kindle 优先的服务端渲染页面，不依赖 SPA 或复杂 JavaScript。
+- 双列家庭学习首页：阅读、单词、今日任务、最近记录。
+- Kindle 风格双列书架、收藏、阅读进度和灰阶缩略封面。
+- 接近一屏的分页阅读、自然段修复、四档字号、三档行距和大面积翻页按钮。
+- 每个账户独立保存天气城市、阅读显示、学习计划与历史记录。
+- 墨读核心 500 词、7 词微单元、7/14/21/28 学习量、初识/熟悉/掌握、动态复现与无复习债务。
+- 家长绑定孩子、配置学习计划、发布读物；管理员审核并查看用户使用概况。
 
-## 本地查看与验证
+## 技术结构
 
-要求 Node.js 18 或更高版本。仓库无第三方 npm 依赖。
+- `worker/index.js`：Cloudflare Worker 入口、服务端页面、路由与会话。
+- `drizzle/`：Cloudflare D1/SQLite 顺序增量迁移。
+- `src/domain/`：平台无关的学习引擎与阅读文本整理。
+- `src/platform/`：D1 仓储与 Kindle 封面缩略图处理。
+- `runtime/`、`scripts/dev-server.mjs`：本地 SQLite 与 R2 文件模拟。
+- `tests/`：学习引擎、迁移、阅读排版和封面回归测试。
+- `local-data/`：本地数据库、上传文件和备份；不会提交 Git。
+
+生产架构只面向 Cloudflare Workers + D1 + R2。历史 `netlify/` 与 `netlify.toml` 仅保留旧账户首次登录验证桥，不作为新功能目标，也不参与常规构建。
+
+## 本地运行
+
+要求 Node.js 22.5 或更高版本、pnpm。
 
 ```powershell
-npm run dev
-npm run build
-npm run validate
+pnpm install
+Copy-Item .env.example .env
+pnpm run dev
 ```
 
-本地开发地址默认为 `http://localhost:8787/k`。首次运行会在 `local-data/` 创建独立的 SQLite 数据库和本地 R2 文件目录，不会连接或修改线上生产数据。
+本地入口：
 
-构建会把 Worker 和 Sites 清单复制到 `dist/`，验证脚本会检查生成文件是有效 ESM，并确认导出了 `fetch` 处理器。完整本地运行仍需要 D1、R2 和 Sites 运行时绑定；仅克隆仓库不会复制生产密钥或远程存储。
+- 产品：<http://localhost:8787/k>
+- 管理员：<http://localhost:8787/admin>
+- 设备检查：<http://localhost:8787/device-test>
 
-## 主要目录
+`.env` 中仅设置本地所需的管理员账户或密钥，禁止提交生产密码、Token 或其他秘密。
 
-- `worker/index.js`：完整应用、页面、路由、会话、后台和业务逻辑
-- `db/schema.ts`：数据库结构说明
-- `drizzle/`：D1 建库和种子迁移
-- `data/pep-new/`：PEP 教材目录、词汇、词组、拼读、语法及题库数据
-- `.openai/hosting.json`：Sites 项目标识和 D1/R2 绑定
-- `archive/chatgpt-share.html`：原始分享页快照
-- `archive/conversation.json`：完整解码后的会话数据
-- `archive/conversation.md`：按当前分支展开的可读会话
-- `archive/live-data/`：迁移时从线上后台导出的目录、答题和使用者记录
-- `docs/HANDOFF.md`：架构、部署与迁移交接说明
+## 检查与构建
 
-## 已实现功能
+```powershell
+pnpm run check
+pnpm run build
+```
 
-- Kindle 首次打开自动建立设备会话，输入昵称即可使用
-- 小说上传、章节识别、服务器分页、书架与独立阅读进度
-- 新版 PEP 教材结构、13 种题型、错题与掌握状态
-- 家长端使用者、计划、知识库、报告、导入导出、设备和天气管理
-- 昆明时间、自动天气与备用天气
-- 多使用者数据隔离、普通 HTML 表单、Cookie 与 CSRF 防护
+`pnpm run build` 只执行 Cloudflare Worker dry-run 构建，不会发布。
 
-只允许 `verified` 内容进入正式练习；自动生成问题保持 `pending`，六年级下册仅保留未审核结构。
+## 数据安全与部署
 
-## 配置
+- 所有数据库升级必须通过 `drizzle/` 中新的向前兼容迁移完成。
+- 禁止在生产数据库执行 `DROP TABLE`、重建数据库或覆盖旧数据。
+- 正式部署前先检查 D1、导出备份、验证待应用 migration，再发布 Worker。
+- 只有在明确收到部署指令后，才执行生产 migration 与 `wrangler deploy`。
+- R2 中保留读物源文件和封面原图，Kindle 页面只读取经过压缩的灰阶 JPEG 缩略图。
 
-环境变量模板见 `.env.example`。生产环境至少需要：
+## 作者说明
 
-- `SESSION_SECRET`
-- `CSRF_SECRET`
-- `DEVICE_TOKEN_SECRET`
-- 可选的 `WEATHER_API_BASE_URL` 和 `WEATHER_API_KEY`
+墨读是作者为自己和家人开发的自用项目，不保证永久在线或永久可用。项目会根据作者的时间、兴趣与心情维护；心情好时，会持续更新功能、修复问题并补充学习内容。
 
-生产密钥没有写入仓库。当前后台固定账号逻辑位于 `worker/index.js`；若仓库将对外公开，应先改为环境变量并轮换现有凭据。
+## License
+
+项目代码使用 [MIT License](LICENSE)。词库数据的具体来源与许可说明见 `data/modu-core-lexicon/README.md`。

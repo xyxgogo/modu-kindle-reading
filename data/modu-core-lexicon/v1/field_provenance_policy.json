@@ -1,0 +1,10 @@
+{
+  "lemma": "NGSL source layer for this seed; normalized by MODU",
+  "meaning_zh": "MODU editorial, independently written concise learner meaning",
+  "ngsl_rank": "NGSL 1.2",
+  "cefr_level": "not populated in seed; future mapping must cite mapping source",
+  "china_curriculum": "not populated in seed; future curriculum mapper",
+  "ipa": "not populated in seed; future open-source pronunciation layer",
+  "relations": "MODU editorial test relations now; WordNet import later kept separate",
+  "examples": "MODU original simple examples"
+}

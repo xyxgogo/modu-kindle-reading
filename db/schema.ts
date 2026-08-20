@@ -1,14 +1,12 @@
 /**
- * 墨读 D1 schema contract.
+ * 墨读本地数据结构说明。
  *
- * The executable migration lives in drizzle/0000_initial.sql so the Sites
- * platform can apply it before the Worker starts. This file documents the
- * logical bindings and the tables used by server-only route handlers without
- * adding a client or runtime ORM dependency to the buildless Worker.
+ * 可执行的 SQLite 迁移位于 drizzle/。此文件只记录服务端路由使用的
+ * 逻辑资源名和核心数据表，不引入运行时 ORM 依赖。
  */
 export const bindings = {
-  d1: "DB",
-  r2: "BUCKET",
+  database: "DB",
+  files: "BUCKET",
 } as const;
 
 export const coreTables = [
@@ -18,7 +16,13 @@ export const coreTables = [
   "device_sessions",
   "device_profiles",
   "users",
+  "accounts",
+  "account_sessions",
+  "parent_applications",
+  "parent_child_bindings",
   "user_preferences",
+  "user_book_preferences",
+  "access_events",
   "books",
   "book_files",
   "chapters",
@@ -35,6 +39,8 @@ export const coreTables = [
   "content_sources",
   "content_reviews",
   "questions",
+  "assessment_libraries",
+  "parent_child_assessment_assignments",
   "study_plans",
   "study_plan_scopes",
   "practice_sessions",
@@ -48,4 +54,17 @@ export const coreTables = [
   "import_jobs",
   "import_errors",
   "audit_logs",
+  "modu_vocab_sources",
+  "modu_vocab_lexemes",
+  "modu_vocab_collections",
+  "modu_vocab_collection_members",
+  "modu_vocab_examples",
+  "modu_vocab_relations",
+  "modu_vocab_field_evidence",
+  "modu_vocab_user_settings",
+  "modu_vocab_sessions",
+  "modu_vocab_progress",
+  "modu_vocab_learning_events",
+  "modu_vocab_reading_exposures",
+  "modu_vocab_parent_plans",
 ] as const;

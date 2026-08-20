@@ -4,9 +4,21 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/dev-server.mjs",
-    "build": "node scripts/build.mjs",
-    "validate": "node scripts/validate-artifact.mjs",
-    "archive:chat": "python scripts/import_chatgpt_share.py archive/chatgpt-share.html --source-url https://chatgpt.com/share/6a69bf94-13dc-83ec-9c81-2b73f4a17e48"
+    "test": "node --test \"tests/*.test.mjs\"",
+    "check": "node --check worker/index.js && node scripts/validate-local.mjs && node --test \"tests/*.test.mjs\"",
+    "build": "wrangler deploy --dry-run --outdir .tmp/cloudflare-build",
+    "legacy:netlify-build": "node scripts/prepare-netlify.mjs",
+    "cloudflare:types": "wrangler types",
+    "cloudflare:deploy": "wrangler deploy"
   },
-  "displayName": "\u58a8\u8bfb \u00b7 Kindle \u5bb6\u5ead\u9605\u8bfb\u4e0e\u82f1\u8bed\u5b66\u4e60\u7ad9"
+  "displayName": "墨读 · Kindle 家庭阅读与单词学习站",
+  "dependencies": {
+    "@netlify/blobs": "^10.7.10",
+    "jpeg-js": "^0.4.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260812.1",
+    "netlify-cli": "^27.0.1",
+    "wrangler": "^4.121.0"
+  }
 }

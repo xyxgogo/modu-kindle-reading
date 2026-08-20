@@ -1,0 +1,46 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "modu-kindle-reading",
+  "main": "./worker/index.js",
+  "workers_dev": true,
+  "preview_urls": false,
+  "routes": [
+    {
+      "pattern": "modu.1005205.xyz",
+      "custom_domain": true
+    }
+  ],
+  "compatibility_date": "2026-08-13",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "LEGACY_AUTH_URL": "https://modu-kindle-reading.netlify.app/__modu_migration_auth"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "modu-kindle-reading",
+      "database_id": "e15f22e6-8cf4-49ef-b16a-6efd8ba3beb1",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "modu-kindle-reading-files"
+    }
+  ],
+  "secrets": {
+    "required": [
+      "SESSION_SECRET",
+      "CSRF_SECRET",
+      "DEVICE_TOKEN_SECRET",
+      "ADMIN_USERNAME",
+      "ADMIN_PASSWORD",
+      "LEGACY_MIGRATION_SECRET"
+    ]
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}

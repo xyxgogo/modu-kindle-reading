@@ -1,0 +1,8 @@
+nodeLinker: hoisted
+
+allowBuilds:
+  esbuild: true
+  netlify-cli: true
+  sharp: true
+  unix-dgram: false
+  workerd: set this to true or false

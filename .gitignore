@@ -1,8 +1,40 @@
-dist/
-site.tar.gz
+# Secrets and local configuration
 .env
-.DS_Store
-__pycache__/
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+
+# Dependencies and package-manager caches
+node_modules/
+.pnpm-store/
+
+# Local and generated application data
 local-data/
-dev-server.log
-dev-server.err.log
+netlify/functions/_assets/
+*.sqlite
+*.sqlite-*
+*.db
+
+# Platform and build output
+.netlify/
+dist/
+coverage/
+.cache/
+.tmp/
+
+# Private migration/source archive
+archive/
+/modu-v2-upgrade-pack/
+
+# Logs and language caches
+*.log
+__pycache__/
+*.py[cod]
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,139 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { DatabaseSync } from "node:sqlite";
+import { resolve } from "node:path";
+import test from "node:test";
+import jpeg from "jpeg-js";
+
+import { paginateChapter, paginateChapterForScreen, parseBookChapters } from "../src/domain/reading-format.mjs";
+import { createKindleJpegThumbnail } from "../src/platform/cover-thumbnail.mjs";
+
+test("TXT 物理换行会合并，空行仍保留真正段落", () => {
+  const chapters = parseBookChapters("第一章 起点\n这是第一句话。\n这是同一段第二句话。\n\n这是第二段。\n继续第二段。");
+  assert.equal(chapters.length, 1);
+  assert.equal(chapters[0].body, "这是第一句话。这是同一段第二句话。\n\n这是第二段。继续第二段。");
+  const pages = paginateChapter(chapters[0].body, 1000);
+  assert.equal(pages[0].split("\n\n").length, 2);
+  assert.equal(pages[0].includes("。\n这是"), false);
+});
+
+test("阅读分页保持自然段且容量接近目标", () => {
+  const paragraph = "墨读让旧 Kindle 继续承担阅读与学习任务。".repeat(90);
+  const pages = paginateChapter(paragraph, 460);
+  assert.ok(pages.length > 3);
+  assert.ok(pages.every((page) => page.length > 250));
+});
+
+test("屏幕分页把首行缩进和段间距计入一屏高度", () => {
+  const paragraphs = Array.from({ length: 28 }, (_, index) => `第${index + 1}段内容用于验证 Kindle 一屏分页，不让正文被底部工具栏遮挡。`).join("\n\n");
+  const pages = paginateChapterForScreen(paragraphs, { charactersPerLine: 20, linesPerPage: 16 });
+  assert.ok(pages.length > 2);
+  for (const page of pages) {
+    const estimatedLines = page.split(/\n\s*\n/gu)
+      .reduce((sum, paragraph) => sum + Math.ceil((paragraph.length + 2) / 20) + .15, 0);
+    assert.ok(estimatedLines <= 16.2);
+  }
+});
+
+test("长段落会使用接近整屏的正文容量", () => {
+  const pages = paginateChapterForScreen("墨读阅读页面应充分使用浏览器可视高度。".repeat(180), {
+    charactersPerLine: 20,
+    linesPerPage: 18,
+  });
+  assert.ok(pages.length > 5);
+  assert.ok(pages.slice(0, -1).every((page) => page.length >= 300));
+});
+
+test("Kindle 封面处理生成小尺寸灰阶 JPEG", () => {
+  const source = new Uint8Array(600 * 900 * 4);
+  for (let index = 0; index < source.length; index += 4) {
+    source[index] = 220;
+    source[index + 1] = 80;
+    source[index + 2] = 30;
+    source[index + 3] = 255;
+  }
+  const original = jpeg.encode({ data: source, width: 600, height: 900 }, 70).data;
+  const thumbnail = createKindleJpegThumbnail(original);
+  assert.equal(thumbnail.width, 260);
+  assert.equal(thumbnail.height, 390);
+  assert.ok(thumbnail.bytes.length < original.length);
+  const decoded = jpeg.decode(thumbnail.bytes, { useTArray: true });
+  assert.equal(decoded.data[0], decoded.data[1]);
+  assert.equal(decoded.data[1], decoded.data[2]);
+});
+
+test("UI 增量迁移保留旧账户并增加个人设置和隐私友好访问统计", async (context) => {
+  const db = new DatabaseSync(":memory:");
+  context.after(() => db.close());
+  for (const name of ["0000_initial.sql", "0003_accounts_roles_reviews.sql"]) {
+    db.exec(await readFile(resolve("drizzle", name), "utf8"));
+  }
+  db.prepare("INSERT INTO users(id, household_id, display_name, normalized_name) VALUES (?, ?, ?, ?)")
+    .run("u1", "household_default", "旧用户", "旧用户");
+  db.prepare("INSERT INTO user_preferences(id, user_id) VALUES (?, ?)").run("p1", "u1");
+  db.prepare("INSERT INTO accounts(id, user_id, username, normalized_username, password_salt, password_hash) VALUES (?, ?, ?, ?, ?, ?)")
+    .run("a1", "u1", "旧用户", "旧用户", "salt", "hash");
+  db.exec(await readFile(resolve("drizzle", "0009_kindle_ui_preferences.sql"), "utf8"));
+  db.exec(await readFile(resolve("drizzle", "0010_access_events.sql"), "utf8"));
+  db.exec(await readFile(resolve("drizzle", "0011_reading_pagination_v2.sql"), "utf8"));
+  db.exec(await readFile(resolve("drizzle", "0012_reading_offsets.sql"), "utf8"));
+  const account = db.prepare("SELECT username, last_active_at FROM accounts WHERE id = 'a1'").get();
+  const pref = db.prepare("SELECT reading_font_scale, reading_line_spacing, weather_city_name FROM user_preferences WHERE user_id = 'u1'").get();
+  assert.deepEqual({ ...account }, { username: "旧用户", last_active_at: null });
+  assert.deepEqual({ ...pref }, { reading_font_scale: "standard", reading_line_spacing: "comfortable", weather_city_name: "昆明" });
+  db.prepare("INSERT INTO users(id, household_id, display_name, normalized_name) VALUES (?, ?, ?, ?)").run("u2", "household_default", "另一个用户", "另一个用户");
+  db.prepare("INSERT INTO user_preferences(id, user_id) VALUES (?, ?)").run("p2", "u2");
+  db.prepare("UPDATE user_preferences SET reading_font_scale = 'extra_large', weather_city_name = '北京' WHERE user_id = 'u1'").run();
+  assert.equal(db.prepare("SELECT weather_city_name FROM user_preferences WHERE user_id = 'u2'").get().weather_city_name, "昆明");
+  const accessColumns = db.prepare("PRAGMA table_info(access_events)").all().map((column) => column.name);
+  assert.ok(accessColumns.includes("source"));
+  assert.ok(accessColumns.includes("client_type"));
+  assert.equal(accessColumns.includes("ip_address"), false);
+  assert.ok(db.prepare("PRAGMA table_info(reading_progress)").all().some((column) => column.name === "pagination_version"));
+  assert.ok(db.prepare("PRAGMA table_info(reading_progress)").all().some((column) => column.name === "text_offset"));
+  assert.ok(db.prepare("PRAGMA table_info(reading_progress)").all().some((column) => column.name === "pagination_target"));
+  assert.equal(db.prepare("PRAGMA foreign_key_check").all().length, 0);
+});
+
+test("管理员删除读物时数据库关系会安全级联", async (context) => {
+  const db = new DatabaseSync(":memory:");
+  context.after(() => db.close());
+  for (const name of ["0000_initial.sql", "0003_accounts_roles_reviews.sql", "0009_kindle_ui_preferences.sql", "0010_access_events.sql", "0011_reading_pagination_v2.sql", "0012_reading_offsets.sql"]) {
+    db.exec(await readFile(resolve("drizzle", name), "utf8"));
+  }
+  db.prepare("INSERT INTO users(id, household_id, display_name, normalized_name) VALUES ('u1', 'household_default', '孩子', '孩子')").run();
+  db.prepare("INSERT INTO books(id, household_id, title, status) VALUES ('b1', 'household_default', '测试读物', 'preview')").run();
+  db.prepare("INSERT INTO chapters(id, book_id, title, body, sort_order) VALUES ('c1', 'b1', '第一章', '正文', 1)").run();
+  db.prepare("INSERT INTO chapter_pages(id, chapter_id, font_size, page_number, body) VALUES ('p1', 'c1', 'medium', 1, '正文')").run();
+  db.prepare("INSERT INTO reading_progress(id, user_id, book_id, chapter_id) VALUES ('r1', 'u1', 'b1', 'c1')").run();
+  db.prepare("INSERT INTO user_book_preferences(user_id, book_id, is_favorite) VALUES ('u1', 'b1', 1)").run();
+  db.prepare("DELETE FROM books WHERE id = 'b1'").run();
+  for (const table of ["books", "chapters", "chapter_pages", "reading_progress", "user_book_preferences"]) {
+    assert.equal(db.prepare(`SELECT COUNT(*) AS count FROM ${table}`).get().count, 0);
+  }
+  assert.equal(db.prepare("PRAGMA foreign_key_check").all().length, 0);
+});
+
+test("Kindle 阅读采用动态一屏分页、高密度书架且默认显示全部读物", async () => {
+  const source = await readFile(resolve("worker", "index.js"), "utf8");
+  assert.match(source, /standard:\s*\{ label: "标准", pixels: 24 \}/u);
+  assert.match(source, /extra_extra_large:\s*\{ label: "最大", pixels: 30 \}/u);
+  assert.match(source, /STORED_PAGE_TARGETS = Object\.freeze\(\{ small: 520, medium: 420, large: 320 \}\)/u);
+  assert.match(source, /readingPageTarget\(scale, lineSpacing, profile\)/u);
+  assert.match(source, /searchParams\.get\("vp"\)/u);
+  assert.match(source, /homeTile\(\{ href: "\/k\/books\?scope=all"/u);
+  assert.match(source, /url\.searchParams\.get\("scope"\)\) \? url\.searchParams\.get\("scope"\) : "all"/u);
+  assert.match(source, /height: 100vh; overflow: hidden/u);
+  assert.match(source, /\.shelf-shell \.book-card \{ width: 25%/u);
+  assert.match(source, /reader-bottom-bar/u);
+  assert.match(source, /\.reader-page \{ position: relative; height: calc\(100vh - 62px\); overflow: hidden; \}/u);
+  assert.match(source, /return redirect\(returnTo\)/u);
+  assert.match(source, /<a href="\$\{escapeHtml\(returnTo\)\}">返回阅读<\/a>/u);
+  assert.doesNotMatch(source, /if \(!session \|\| session\.device_status !== "active"\) return createAutomaticDeviceSession/u);
+  assert.match(source, /maximum-scale=1\.0, user-scalable=0, viewport-fit=cover/u);
+  assert.ok(source.includes("var oldKindle=/Kindle\\\\/3\\\\.0|AppleWebKit\\\\/53[01]/i"));
+  assert.match(source, /main\.style\.webkitTransform='scale\('/u);
+  assert.match(source, /requiresPositionRemap/u);
+  assert.match(source, /legacyFontTarget\(savedProgress\.reading_font_scale\)/u);
+  assert.match(source, /READING_PAGINATION_VERSION = 5/u);
+});

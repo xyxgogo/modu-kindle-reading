@@ -1,0 +1,15 @@
+export const MIGRATION_NAMES = Object.freeze([
+  "0000_initial.sql",
+  "0001_pep_new_seed.sql",
+  "0002_verified_question_types.sql",
+  "0003_accounts_roles_reviews.sql",
+  "0004_modu_vocab_v2.sql",
+  "0005_seed_modu_core_500.sql",
+  "0006_learning_collections_and_plans.sql",
+  "0007_core_learning_stages.sql",
+  "0008_plan_configured_flag.sql",
+  "0009_kindle_ui_preferences.sql",
+  "0010_access_events.sql",
+  "0011_reading_pagination_v2.sql",
+  "0012_reading_offsets.sql",
+]);

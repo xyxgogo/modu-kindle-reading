@@ -1,0 +1,28 @@
+{
+  "package": "MODU Core Lexicon Seed 500",
+  "version": "0.1.0",
+  "record_count": 500,
+  "example_count": 141,
+  "relation_edge_count": 38,
+  "capability_counts": {
+    "recognition": 500,
+    "meaning": 500,
+    "recall": 500,
+    "context": 141,
+    "relation": 75
+  },
+  "canonical_assets": [
+    "data/editorial/*",
+    "data/sources/*"
+  ],
+  "runtime_assets": [
+    "data/runtime/modu_core_lexicon_seed_500.jsonl",
+    "data/runtime/modu_core_lexicon_seed_500.csv"
+  ],
+  "sqlite_note": "Local validation artifact only; do not couple application logic to SQLite/D1.",
+  "sha256": {
+    "modu_core_lexicon_seed_500.jsonl": "6cd31957e69dfadd02c241987244aef4dfed985c89a78a1353f4112c4531e89b",
+    "modu_core_lexicon_seed_500.csv": "999b49f12db7ea5ab03fc61acacb25e58c75dfe9d322b62bdea56256e6471519",
+    "modu_core_lexicon_seed_500.sqlite": "e765a0de02111ada75fdcfc45be6b36889552ef2a51dadd8e06572fa77c78e5d"
+  }
+}
