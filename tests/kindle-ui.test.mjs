@@ -114,26 +114,24 @@ test("管理员删除读物时数据库关系会安全级联", async (context) =
   assert.equal(db.prepare("PRAGMA foreign_key_check").all().length, 0);
 });
 
-test("Kindle 阅读采用动态一屏分页、高密度书架且默认显示全部读物", async () => {
+test("Kindle 阅读采用 kindle2 自适应分页、双列书架且默认显示全部读物", async () => {
   const source = await readFile(resolve("worker", "index.js"), "utf8");
-  assert.match(source, /standard:\s*\{ label: "标准", pixels: 24 \}/u);
-  assert.match(source, /extra_extra_large:\s*\{ label: "最大", pixels: 30 \}/u);
-  assert.match(source, /STORED_PAGE_TARGETS = Object\.freeze\(\{ small: 520, medium: 420, large: 320 \}\)/u);
-  assert.match(source, /readingPageTarget\(scale, lineSpacing, profile\)/u);
-  assert.match(source, /searchParams\.get\("vp"\)/u);
-  assert.match(source, /homeTile\(\{ href: "\/k\/books\?scope=all"/u);
+  const engine = await readFile(resolve("src", "kindle", "engine.mjs"), "utf8");
+  const reader = await readFile(resolve("public", "book-reader.js"), "utf8");
+  const css = await readFile(resolve("public", "kindle.css"), "utf8");
+  assert.match(source, /homeTile\(\{ href: "\/k\/library\?scope=all"/u);
   assert.match(source, /url\.searchParams\.get\("scope"\)\) \? url\.searchParams\.get\("scope"\) : "all"/u);
-  assert.match(source, /height: 100vh; overflow: hidden/u);
-  assert.match(source, /\.shelf-shell \.book-card \{ width: 25%/u);
-  assert.match(source, /reader-bottom-bar/u);
-  assert.match(source, /\.reader-page \{ position: relative; height: calc\(100vh - 62px\); overflow: hidden; \}/u);
+  assert.match(source, /renderKindleLibrary/u);
+  assert.match(source, /renderKindleReader/u);
+  assert.match(engine, /selected-bookshelf/u);
+  assert.match(engine, /字体大小：/u);
+  assert.match(reader, /page\.scrollHeight <= page\.clientHeight/u);
+  assert.match(reader, /while \(low < high\)/u);
+  assert.match(css, /height: 1228px/u);
+  assert.match(css, /height: 1074px/u);
+  assert.match(css, /book-size-64/u);
   assert.match(source, /return redirect\(returnTo\)/u);
   assert.match(source, /<a href="\$\{escapeHtml\(returnTo\)\}">返回阅读<\/a>/u);
   assert.doesNotMatch(source, /if \(!session \|\| session\.device_status !== "active"\) return createAutomaticDeviceSession/u);
-  assert.match(source, /maximum-scale=1\.0, user-scalable=0, viewport-fit=cover/u);
-  assert.ok(source.includes("var oldKindle=/Kindle\\\\/3\\\\.0|AppleWebKit\\\\/53[01]/i"));
-  assert.match(source, /main\.style\.webkitTransform='scale\('/u);
-  assert.match(source, /requiresPositionRemap/u);
-  assert.match(source, /legacyFontTarget\(savedProgress\.reading_font_scale\)/u);
-  assert.match(source, /READING_PAGINATION_VERSION = 5/u);
+  assert.match(source, /READING_PAGINATION_VERSION = 6/u);
 });

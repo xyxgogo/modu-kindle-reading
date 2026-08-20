@@ -27,6 +27,8 @@ coverage/
 # Private migration/source archive
 archive/
 /modu-v2-upgrade-pack/
+/kindle1.5/
+/kindle2.0/
 
 # Logs and language caches
 *.log

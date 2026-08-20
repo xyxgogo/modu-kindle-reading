@@ -5,6 +5,16 @@ import { availableActivities } from "../src/domain/lexicon.mjs";
 import { paginateChapter, paginateChapterForScreen, parseBookChapters } from "../src/domain/reading-format.mjs";
 import { createKindleJpegThumbnail } from "../src/platform/cover-thumbnail.mjs";
 import { D1Repository } from "../src/platform/d1-repository.mjs";
+import {
+  KINDLE_FALLBACK_CHARACTERS,
+  detectKindleDevice,
+  kindleReaderHref,
+  renderKindleLibrary,
+  renderKindleReader,
+  renderKindleToc,
+  scaleForKindleSize,
+  selectedKindleSize,
+} from "../src/kindle/engine.mjs";
 
 const COOKIE_DEVICE = "modu_device_session";
 const COOKIE_ADMIN = "modu_admin_session";
@@ -153,7 +163,7 @@ function fontScaleConfig(value) {
   return configs[value] || configs.standard;
 }
 
-const READING_PAGINATION_VERSION = 5;
+const READING_PAGINATION_VERSION = 6;
 const STORED_PAGE_TARGETS = Object.freeze({ small: 520, medium: 420, large: 320 });
 
 function v2FontTarget(value) {
@@ -809,26 +819,6 @@ async function createAccountSession(env, accountId) {
   return { token, csrfToken };
 }
 
-async function verifyLegacyAccountPassword(env, username, password) {
-  if (!env.LEGACY_AUTH_URL || !env.LEGACY_MIGRATION_SECRET) return false;
-  try {
-    const response = await fetch(env.LEGACY_AUTH_URL, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-modu-migration-secret": env.LEGACY_MIGRATION_SECRET,
-      },
-      body: JSON.stringify({ username, password }),
-    });
-    return response.status === 204;
-  } catch (error) {
-    console.error("legacy_auth_failed", {
-      name: String(error?.name || "Error").slice(0, 80),
-    });
-    return false;
-  }
-}
-
 function safeAccountReturnTo(raw, fallback = "/k/home") {
   const value = String(raw || fallback);
   if ((value.startsWith("/k") || value.startsWith("/parent")) && !value.startsWith("//")) return value;
@@ -871,15 +861,8 @@ async function accountLogin(request, env, url, deviceSession) {
     let expectedDigest = account?.password_hash || "";
     if (account && Number(account.password_iterations) <= PASSWORD_ITERATIONS) {
       digest = await passwordDigest(password, account.password_salt, account.password_iterations);
-    } else if (account && await verifyLegacyAccountPassword(env, name.normalized, password)) {
-      const migratedSalt = randomToken(16);
-      digest = await passwordDigest(password, migratedSalt, PASSWORD_ITERATIONS);
-      await env.DB.prepare(`
-        UPDATE accounts
-           SET password_salt = ?, password_hash = ?, password_iterations = ?, updated_at = datetime('now')
-         WHERE id = ? AND password_iterations > ?
-      `).bind(migratedSalt, digest, PASSWORD_ITERATIONS, account.id, PASSWORD_ITERATIONS).run();
-      expectedDigest = digest;
+    } else if (account) {
+      return redirect(`/k/login?error=upgrade&return_to=${encodeURIComponent(returnTo)}`);
     }
     if (!account || account.status !== "active" || !safeEqual(digest, expectedDigest)) {
       return redirect(`/k/login?error=1&return_to=${encodeURIComponent(returnTo)}`);
@@ -896,6 +879,7 @@ async function accountLogin(request, env, url, deviceSession) {
     title: "账户登录",
     body: `<h1>账户登录</h1>
       ${url.searchParams.get("error") === "1" ? '<div class="warning">用户名或密码错误。</div>' : ""}
+      ${url.searchParams.get("error") === "upgrade" ? '<div class="warning">系统已升级，请重新登录 modu.1005205.xyz 注册使用。</div>' : ""}
       <form method="post" action="/k/login?return_to=${encodeURIComponent(returnTo)}">
         <input type="hidden" name="csrf_token" value="${escapeHtml(csrf)}">
         <label for="username">用户名</label>
@@ -2008,7 +1992,7 @@ async function homePage(env, url, session, user, account) {
   const completed = Number(Boolean(todayWords)) + Number(Boolean(todayReading)) + Number(Boolean(stats?.plan_configured)) + Number(dueWords === 0);
   const recentText = recent ? `《${recent.title}》 ${recent.chapter_title || "正文"}` : "尚无阅读记录";
   const tiles = [
-    homeTile({ href: "/k/books?scope=all", icon: "book", title: "阅读", subtitle: "全部读物 / 继续阅读", status: recentText }),
+    homeTile({ href: "/k/library?scope=all", icon: "book", title: "阅读", subtitle: "全部读物 / 继续阅读", status: recentText }),
     isParent
       ? homeTile({ href: "/parent", icon: "family", title: "家庭管理", subtitle: "孩子、读物与计划", status: "进入家长功能" })
       : homeTile({ href: "/k/words", icon: "words", title: "单词", subtitle: "学习 / 复习单词", status: dueWords ? `待复习 ${dueWords} 个` : `今日新词 ${Number(stats?.batch_size || 14)} 个` }),
@@ -2035,7 +2019,7 @@ async function todayPage(env, user, account) {
   await touchAccountActivity(env, account.account_id);
   const [stats, recent] = await Promise.all([userDashboardStats(env, user.id), latestReading(env, user.id)]);
   const tasks = [
-    ["阅读", Number(stats?.today_reading || 0) > 0, recent ? `继续《${recent.title}》` : "从书架选择读物", "/k/books"],
+    ["阅读", Number(stats?.today_reading || 0) > 0, recent ? `继续《${recent.title}》` : "从书架选择读物", "/k/library"],
     ["新词", Number(stats?.today_words || 0) > 0, `今日计划 ${Number(stats?.batch_size || 14)} 词`, "/k/words"],
     ["复习", Number(stats?.due_words || 0) === 0, `待复习 ${Number(stats?.due_words || 0)} 词`, "/k/words"],
     ["学习计划", Boolean(stats?.plan_configured), stats?.plan_configured ? "计划已设置" : "尚未设置", "/k/words/setup"],
@@ -3725,25 +3709,16 @@ async function adminChapterEdit(request, env, identity, chapterId) {
   return redirect(`/admin/books/${encodeURIComponent(chapter.book_id)}?notice=chapter_updated`);
 }
 
-function novelParagraphs(text) {
-  return String(text || "").split(/\n\s*\n/gu).filter(Boolean).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("");
-}
-
 async function kindleBooks(request, env, user, session, account, url) {
-  const profile = readingClientProfile(request);
   const scope = ["continue", "all", "favorites"].includes(url.searchParams.get("scope")) ? url.searchParams.get("scope") : "all";
   const scopeSql = scope === "continue" ? "AND rp.book_id IS NOT NULL" : scope === "favorites" ? "AND COALESCE(ubp.is_favorite, 0) = 1" : "";
   const result = await env.DB.prepare(`
-    SELECT b.id, b.title, b.author, b.total_chapters, b.total_pages, b.cover_thumbnail_key,
-      rp.chapter_id, rp.page, rp.reading_font_scale, rp.pagination_version,
-      rp.text_offset, rp.pagination_target, rp.updated_at,
-      c.title AS chapter_title, c.sort_order AS chapter_order,
+    SELECT b.id, b.title, b.author, b.total_chapters, b.total_pages,
+      rp.chapter_id, rp.page, rp.reading_font_scale, rp.text_offset, rp.updated_at,
       (SELECT id FROM chapters first_chapter WHERE first_chapter.book_id = b.id ORDER BY sort_order LIMIT 1) AS first_chapter_id,
-      (SELECT COUNT(*) FROM chapter_pages cp WHERE cp.chapter_id = rp.chapter_id AND cp.font_size = 'medium') AS chapter_pages,
       COALESCE(ubp.is_favorite, 0) AS is_favorite
     FROM books b
     LEFT JOIN reading_progress rp ON rp.book_id = b.id AND rp.user_id = ?
-    LEFT JOIN chapters c ON c.id = rp.chapter_id
     LEFT JOIN user_book_preferences ubp ON ubp.book_id = b.id AND ubp.user_id = ?
     WHERE b.status = 'published' AND b.review_status = 'approved'
       AND (
@@ -3756,40 +3731,22 @@ async function kindleBooks(request, env, user, session, account, url) {
       ${scopeSql}
     ORDER BY CASE WHEN rp.updated_at IS NULL THEN 1 ELSE 0 END, rp.updated_at DESC, b.sort_order, b.title
   `).bind(user.id, user.id, account.account_id, account.normalized_username).all();
-  const allBooks = result.results || [];
-  const pageCount = Math.max(1, Math.ceil(allBooks.length / profile.shelfPageSize));
-  const requestedPage = Math.max(1, Number.parseInt(url.searchParams.get("page") || "1", 10) || 1);
-  const shelfPage = Math.min(pageCount, requestedPage);
-  const visibleBooks = allBooks.slice((shelfPage - 1) * profile.shelfPageSize, shelfPage * profile.shelfPageSize);
-  const cards = visibleBooks.map((book) => {
-    const chapterPart = Math.max(0, Number(book.chapter_order || 1) - 1);
-    const withinChapter = Number(book.chapter_pages || 0) ? Number(book.page || 1) / Number(book.chapter_pages) : 0;
-    const progress = book.chapter_id ? Math.min(100, Math.max(1, Math.round((chapterPart + withinChapter) / Math.max(1, Number(book.total_chapters || 1)) * 100))) : 0;
-    // Keep the saved page number in the link. kindleRead remaps it from the
-    // stored text offset when the viewport or font profile has changed.
-    const continuePage = book.chapter_id ? Math.max(1, Number(book.page || 1)) : 1;
+  const books = (result.results || []).map((book) => {
     const readChapterId = book.chapter_id || book.first_chapter_id;
-    const readHref = readChapterId
-      ? readingHref(`/k/read/${book.id}/${readChapterId}/${continuePage}`, profile)
-      : `/k/book/${book.id}`;
-    return `<section class="book-card"><a class="book-cover-link" href="${escapeHtml(readHref)}"><img class="book-cover" src="/k/cover/${escapeHtml(book.id)}" alt="${escapeHtml(book.title)}封面"></a>
-      <div class="book-meta"><h2><a href="${escapeHtml(readHref)}">${escapeHtml(book.title)}${book.chapter_title ? ` · ${progress}%` : ""}</a></h2></div></section>`;
-  }).join("");
-  const scopeQuery = encodeURIComponent(scope);
-  const previousShelf = shelfPage > 1 ? `/k/books?scope=${scopeQuery}&page=${shelfPage - 1}` : null;
-  const nextShelf = shelfPage < pageCount ? `/k/books?scope=${scopeQuery}&page=${shelfPage + 1}` : null;
-  return htmlResponse(layout({
-    title: "阅读",
-    brand: false,
-    pageClass: `shelf-shell shelf-${profile.kind}`,
-    body: `<div class="shelf-head"><div class="shelf-title"><h1>墨读　<span style="font-size:.55em;font-weight:normal">阅读</span></h1><p>你好，${escapeHtml(user.display_name)}</p></div>
-      <div class="shelf-actions"><a class="top-link" href="/k/me">${iconSvg("user")} 我的</a></div></div>
-      <div class="shelf-tabs"><a class="shelf-tab ${scope === "continue" ? "active" : ""}" href="/k/books?scope=continue">继续阅读</a><a class="shelf-tab ${scope === "all" ? "active" : ""}" href="/k/books?scope=all">全部书籍</a><a class="shelf-tab ${scope === "favorites" ? "active" : ""}" href="/k/books?scope=favorites">收藏</a></div>
-      <section class="book-grid">${cards || `<p class="warning">${scope === "continue" ? '还没有阅读记录。<a href="/k/books?scope=all">查看全部书籍</a>' : scope === "favorites" ? '还没有收藏读物。' : '书架暂时为空。绑定家长上传的读物经管理员审核通过后会显示在这里。'}</p>`}</section>
-      <div class="shelf-pager"><div class="shelf-pager-cell">${previousShelf ? `<a id="prev-page" href="${previousShelf}">‹ 上一页</a>` : `<span>上一页　${shelfPage}/${pageCount}</span>`}</div>
-      <div class="shelf-pager-cell">${nextShelf ? `<a id="next-page" href="${nextShelf}">下一页 ›</a>` : `<span>${shelfPage}/${pageCount}　下一页</span>`}</div></div>`,
-    script: viewportCalibrationScript(),
-  }));
+    const savedSize = book.reading_font_scale === "standard" ? 48
+      : ["large", "extra_large"].includes(book.reading_font_scale) ? 56 : 64;
+    return {
+      ...book,
+      href: readChapterId ? kindleReaderHref({
+        bookId: book.id,
+        chapterId: readChapterId,
+        start: Math.max(0, Number(book.text_offset || 0)),
+        page: Math.max(1, Number(book.page || 1)),
+        size: savedSize,
+      }) : `/k/book/${encodeURIComponent(book.id)}/toc`,
+    };
+  });
+  return htmlResponse(renderKindleLibrary({ device: detectKindleDevice(request), books, scope }));
 }
 
 async function kindleBookFavorite(request, env, user, session) {
@@ -3804,10 +3761,10 @@ async function kindleBookFavorite(request, env, user, session) {
     VALUES (?, ?, ?, datetime('now'), datetime('now'))
     ON CONFLICT(user_id, book_id) DO UPDATE SET is_favorite = excluded.is_favorite, updated_at = datetime('now')
   `).bind(user.id, bookId, favorite).run();
-  return redirect(`/k/books?scope=${favorite ? "favorites" : "all"}`);
+  return redirect(`/k/library?scope=${favorite ? "favorites" : "all"}`);
 }
 
-async function kindleBookDetail(env, user, account, bookId) {
+async function kindleBookDetail(request, env, user, account, bookId) {
   const book = await env.DB.prepare(`
     SELECT b.* FROM books b
     WHERE b.id = ? AND b.status = 'published' AND b.review_status = 'approved'
@@ -3820,34 +3777,39 @@ async function kindleBookDetail(env, user, account, bookId) {
       )
     LIMIT 1
   `).bind(bookId, account.account_id, account.normalized_username).first();
-  if (!book) return errorPage(404, "读物不存在", "该读物不存在、尚未审核通过或未向当前孩子开放。", '<a href="/k/books">返回阅读</a>');
-  const result = await env.DB.prepare(`
+  if (!book) return errorPage(404, "读物不存在", "该读物不存在、尚未审核通过或未向当前孩子开放。", '<a href="/k/library">返回阅读</a>');
+  const [result, progress] = await Promise.all([env.DB.prepare(`
     SELECT id, title, sort_order FROM chapters WHERE book_id = ? ORDER BY sort_order
-  `).bind(bookId).all();
-  const chapters = (result.results || []).map((chapter) => `<a class="button" href="/k/read/${escapeHtml(book.id)}/${escapeHtml(chapter.id)}/1">${Number(chapter.sort_order)}. ${escapeHtml(chapter.title)}</a>`).join("");
-  return htmlResponse(layout({
-    title: book.title,
-    body: `<div class="current-user">当前使用者：${escapeHtml(user.display_name)}</div>
-      <h1>${escapeHtml(book.title)}</h1>
-      <p>作者：${escapeHtml(book.author || "未署名")}</p>
-      <p>${escapeHtml(book.summary || "")}</p>
-      <h2>目录</h2>${chapters}`,
-    nav: '<a href="/k/books">阅读</a> | <a href="/k/home">个人主页</a>',
+  `).bind(bookId).all(), env.DB.prepare(`
+    SELECT chapter_id, page, reading_font_scale, text_offset
+    FROM reading_progress WHERE user_id = ? AND book_id = ? LIMIT 1
+  `).bind(user.id, bookId).first()]);
+  const savedSize = progress?.reading_font_scale === "standard" ? 48
+    : ["large", "extra_large"].includes(progress?.reading_font_scale) ? 56 : 64;
+  const chapters = (result.results || []).map((chapter) => ({
+    ...chapter,
+    href: kindleReaderHref({ bookId, chapterId: chapter.id, size: savedSize }),
   }));
+  const firstChapter = chapters[0];
+  const continueHref = progress?.chapter_id
+    ? kindleReaderHref({
+      bookId,
+      chapterId: progress.chapter_id,
+      start: Math.max(0, Number(progress.text_offset || 0)),
+      page: Math.max(1, Number(progress.page || 1)),
+      size: savedSize,
+    })
+    : firstChapter?.href || null;
+  return htmlResponse(renderKindleToc({ device: detectKindleDevice(request), book, chapters, continueHref }));
 }
 
-async function kindleRead(request, env, user, session, account, bookId, chapterId, pageNumber) {
+async function kindleRead(request, env, user, session, account, bookId, chapterId, legacyPageNumber = null) {
   await touchAccountActivity(env, account.account_id);
-  const [pref, savedProgress] = await Promise.all([
-    env.DB.prepare(`SELECT reading_font_scale, reading_line_spacing FROM user_preferences WHERE user_id = ? LIMIT 1`).bind(user.id).first(),
-    env.DB.prepare(`SELECT chapter_id, page, reading_font_scale, pagination_version, text_offset, pagination_target FROM reading_progress WHERE user_id = ? AND book_id = ? LIMIT 1`).bind(user.id, bookId).first(),
-  ]);
-  const profile = readingClientProfile(request);
-  const scale = pref?.reading_font_scale || "standard";
-  const lineSpacing = pref?.reading_line_spacing || "comfortable";
-  const spacing = lineSpacingConfig(lineSpacing);
-  const pageLayout = readingPageLayout(scale, lineSpacing, profile);
-  const pageTarget = pageLayout.target;
+  const url = new URL(request.url);
+  const savedProgress = await env.DB.prepare(`
+    SELECT chapter_id, page, reading_font_scale, pagination_version, text_offset, pagination_target
+    FROM reading_progress WHERE user_id = ? AND book_id = ? LIMIT 1
+  `).bind(user.id, bookId).first();
   const book = await env.DB.prepare(`
     SELECT b.id, b.title FROM books b
     WHERE b.id = ? AND b.status = 'published' AND b.review_status = 'approved'
@@ -3860,39 +3822,40 @@ async function kindleRead(request, env, user, session, account, bookId, chapterI
       )
     LIMIT 1
   `).bind(bookId, account.account_id, account.normalized_username).first();
-  if (!book) return errorPage(404, "读物不可用", "该读物尚未审核通过或未向当前孩子开放。", '<a href="/k/books">返回阅读</a>');
+  if (!book) return errorPage(404, "读物不可用", "该读物尚未审核通过或未向当前孩子开放。", '<a href="/k/library">返回阅读</a>');
   const chapterResult = await env.DB.prepare(`
     SELECT id, title, body, sort_order FROM chapters WHERE book_id = ? ORDER BY sort_order
   `).bind(bookId).all();
-  const chapters = (chapterResult.results || []).map((chapter) => ({
-    ...chapter,
-    pages: paginateChapterForScreen(chapter.body, pageLayout),
-  }));
+  const chapters = (chapterResult.results || []).map((chapter) => ({ ...chapter, body: String(chapter.body || "").replace(/^\uFEFF/u, "").replace(/\r\n?/gu, "\n").trim() }));
   const chapterIndex = chapters.findIndex((chapter) => chapter.id === chapterId);
   const chapter = chapters[chapterIndex];
-  const savedVersion = Number(savedProgress?.pagination_version || 1);
-  const savedTarget = Number(savedProgress?.pagination_target || 0);
-  const requiresPositionRemap = savedProgress && savedProgress.chapter_id === chapterId
-    && Number(savedProgress.page) === pageNumber
-    && (savedVersion < READING_PAGINATION_VERSION || savedTarget !== pageTarget || savedProgress.reading_font_scale !== scale);
-  if (chapter && requiresPositionRemap) {
-    const oldTarget = savedVersion < 2
-      ? legacyFontTarget(savedProgress.reading_font_scale)
-      : savedVersion < 3 ? v2FontTarget(savedProgress.reading_font_scale) : Math.max(1, savedTarget);
-    const textOffset = savedVersion >= 3
-      ? Math.max(0, Number(savedProgress.text_offset || 0))
-      : Math.max(0, pageNumber - 1) * oldTarget;
-    const migratedPage = pageForTextOffset(chapter.pages, textOffset);
-    await env.DB.prepare(`
-      UPDATE reading_progress SET page = ?, reading_font_scale = ?, pagination_version = ?, text_offset = ?, pagination_target = ?, updated_at = datetime('now')
-      WHERE user_id = ? AND book_id = ?
-    `).bind(migratedPage, scale, READING_PAGINATION_VERSION, textOffset, pageTarget, user.id, bookId).run();
-    if (migratedPage !== pageNumber) return redirect(readingHref(`/k/read/${bookId}/${chapterId}/${migratedPage}`, profile));
+  if (!chapter || !chapter.body) return errorPage(404, "阅读页不存在", "章节不存在或没有正文。", `<a href="/k/book/${escapeHtml(bookId)}/toc">返回目录</a>`);
+  const size = selectedKindleSize(url, savedProgress?.reading_font_scale || "");
+  let requestedStart = Number.parseInt(url.searchParams.get("start") || "", 10);
+  if (!Number.isFinite(requestedStart) && savedProgress?.chapter_id === chapterId) requestedStart = Number(savedProgress.text_offset || 0);
+  if (!Number.isFinite(requestedStart) && legacyPageNumber && legacyPageNumber > 1) {
+    const legacyPages = paginateChapterForScreen(chapter.body, readingPageLayout(savedProgress?.reading_font_scale || "standard", "comfortable", readingClientProfile(request)));
+    requestedStart = textOffsetForPage(legacyPages, legacyPageNumber);
   }
-  const pageBody = chapter?.pages?.[pageNumber - 1];
-  if (!chapter || pageBody == null) return errorPage(404, "阅读页不存在", "章节或页码不存在。", `<a href="/k/book/${escapeHtml(bookId)}">返回目录</a>`);
-  const pagesBefore = chapters.slice(0, chapterIndex).reduce((sum, item) => sum + item.pages.length, 0);
-  const bookPages = chapters.reduce((sum, item) => sum + item.pages.length, 0);
+  const start = Math.min(Math.max(Number.isFinite(requestedStart) ? requestedStart : 0, 0), Math.max(chapter.body.length - 1, 0));
+  const requestedPage = Number.parseInt(url.searchParams.get("page") || "", 10);
+  const pageNumber = Math.max(1, Number.isFinite(requestedPage) ? requestedPage : legacyPageNumber || (savedProgress?.chapter_id === chapterId ? Number(savedProgress.page || 1) : 1));
+  const requestedPrevious = Number.parseInt(url.searchParams.get("prev") || "", 10);
+  const previous = Number.isFinite(requestedPrevious) && requestedPrevious >= 0 && requestedPrevious < start ? requestedPrevious : undefined;
+  const perPage = KINDLE_FALLBACK_CHARACTERS[size];
+  const estimatedCounts = chapters.map((item) => Math.max(1, Math.ceil(item.body.length / perPage)));
+  const pagesBefore = estimatedCounts.slice(0, chapterIndex).reduce((sum, count) => sum + count, 0);
+  const totalPages = estimatedCounts.reduce((sum, count) => sum + count, 0);
+  const bookLength = chapters.reduce((sum, item) => sum + item.body.length, 0);
+  const bookOffsetBefore = chapters.slice(0, chapterIndex).reduce((sum, item) => sum + item.body.length, 0);
+  const previousChapter = chapters[chapterIndex - 1];
+  const nextChapter = chapters[chapterIndex + 1];
+  const previousChapterHref = previousChapter ? kindleReaderHref({
+    bookId, chapterId: previousChapter.id,
+    start: Math.max(0, previousChapter.body.length - perPage),
+    page: estimatedCounts[chapterIndex - 1], size,
+  }) : null;
+  const nextChapterHref = nextChapter ? kindleReaderHref({ bookId, chapterId: nextChapter.id, size }) : null;
   await env.DB.prepare(`
     INSERT INTO reading_progress
       (id, user_id, book_id, chapter_id, page, font_size, reading_font_scale, pagination_version,
@@ -3905,34 +3868,14 @@ async function kindleRead(request, env, user, session, account, bookId, chapterI
       text_offset = excluded.text_offset,
       pagination_target = excluded.pagination_target,
       last_read_at = datetime('now'), updated_at = datetime('now')
-  `).bind(crypto.randomUUID(), user.id, bookId, chapterId, pageNumber, scale,
-    READING_PAGINATION_VERSION, textOffsetForPage(chapter.pages, pageNumber), pageTarget).run();
-  await recordReadingExposures(env, user.id, bookId, chapterId, pageNumber, pageBody);
-  const prevPagePath = pageNumber > 1
-    ? `/k/read/${bookId}/${chapterId}/${pageNumber - 1}`
-    : chapterIndex > 0 ? `/k/read/${bookId}/${chapters[chapterIndex - 1].id}/${chapters[chapterIndex - 1].pages.length}` : null;
-  const nextPagePath = pageNumber < chapter.pages.length
-    ? `/k/read/${bookId}/${chapterId}/${pageNumber + 1}`
-    : chapterIndex < chapters.length - 1 ? `/k/read/${bookId}/${chapters[chapterIndex + 1].id}/1` : null;
-  const prevPage = prevPagePath ? readingHref(prevPagePath, profile) : null;
-  const nextPage = nextPagePath ? readingHref(nextPagePath, profile) : null;
-  const currentReadPath = readingHref(`/k/read/${bookId}/${chapterId}/${pageNumber}`, profile);
-  const progress = Math.min(100, Math.max(1, Math.round((pagesBefore + pageNumber) / Math.max(1, bookPages) * 100)));
-  const absolutePage = pagesBefore + pageNumber;
-  return htmlResponse(layout({
-    title: `${book.title} · ${chapter.title}`,
-    brand: false,
-    pageClass: `reader-shell reader-${profile.kind}`,
-    body: `<header class="reader-context"><div class="reader-context-item"><a href="/k/books?scope=all">‹ ${escapeHtml(book.title.length > 7 ? `${book.title.slice(0, 7)}…` : book.title)}</a></div>
-      <div class="reader-context-item">${escapeHtml(chapter.title)}</div><div class="reader-context-item"><a href="/k/settings?return_to=${encodeURIComponent(currentReadPath)}">Aa</a></div></header>
-      <section class="reader-page"><article class="reader-page-body" style="font-size:${readingDisplayPixels(scale, profile)}px;line-height:${spacing.value}">${novelParagraphs(pageBody)}</article></section>
-      <div class="reader-page-number">第 ${absolutePage} / ${bookPages} 页　·　${progress}%</div>
-      <div class="reader-bottom-bar"><div class="reader-bottom-item"><a href="/k/books?scope=all">书架</a></div>
-      <div class="reader-bottom-item"><a href="/k/settings?return_to=${encodeURIComponent(currentReadPath)}">字体</a></div>
-      <div class="reader-bottom-item"><a href="/k/book/${escapeHtml(bookId)}">目录</a></div>
-      <div class="reader-bottom-item ${prevPage ? "" : "disabled"}">${prevPage ? `<a id="prev-page" href="${escapeHtml(prevPage)}">上一页</a>` : "<span>上一页</span>"}</div>
-      <div class="reader-bottom-item ${nextPage ? "" : "disabled"}">${nextPage ? `<a id="next-page" href="${escapeHtml(nextPage)}">下一页</a>` : "<span>读完</span>"}</div></div>`,
-    script: viewportCalibrationScript(),
+  `).bind(crypto.randomUUID(), user.id, bookId, chapterId, pageNumber, scaleForKindleSize(size),
+    READING_PAGINATION_VERSION, start, size).run();
+  const exposureText = chapter.body.slice(start, start + perPage);
+  await recordReadingExposures(env, user.id, bookId, chapterId, pageNumber, exposureText);
+  return htmlResponse(renderKindleReader({
+    device: detectKindleDevice(request), book, chapter, source: chapter.body, start,
+    page: pageNumber, size, previous, previousChapterHref, nextChapterHref,
+    pagesBefore, totalPages, bookLength, bookOffsetBefore,
   }));
 }
 
@@ -4795,7 +4738,8 @@ async function routeKindle(request, env, url) {
     return account ? redirect("/k/home") : accountEntryPage(env, url);
   }
   if (!account || !account.user_id || account.user_status !== "active") {
-    return redirect(`/k/login?return_to=${encodeURIComponent(url.pathname)}`);
+    const hasOldSession = Boolean(parseCookies(request)[COOKIE_ACCOUNT]);
+    return redirect(`/k/login?${hasOldSession ? "error=upgrade&" : ""}return_to=${encodeURIComponent(url.pathname)}`);
   }
   const user = {
     id: account.user_id,
@@ -4819,14 +4763,14 @@ async function routeKindle(request, env, url) {
     url.pathname === "/k/practice/start" ||
     url.pathname.startsWith("/k/practice/")
   )) return redirect("/parent");
-  if (url.pathname === "/k/books" && request.method === "GET") return kindleBooks(request, env, user, accountSession, account, url);
+  if ((url.pathname === "/k/library" || url.pathname === "/k/books") && request.method === "GET") return kindleBooks(request, env, user, accountSession, account, url);
   if (url.pathname === "/k/books/favorite" && request.method === "POST") return kindleBookFavorite(request, env, user, accountSession);
   const coverMatch = url.pathname.match(/^\/k\/cover\/([^/]+)$/u);
   if (coverMatch && request.method === "GET") return kindleCover(env, decodeURIComponent(coverMatch[1]));
-  const bookMatch = url.pathname.match(/^\/k\/book\/([^/]+)$/u);
-  if (bookMatch && request.method === "GET") return kindleBookDetail(env, user, account, decodeURIComponent(bookMatch[1]));
-  const readMatch = url.pathname.match(/^\/k\/read\/([^/]+)\/([^/]+)\/([0-9]+)$/u);
-  if (readMatch && request.method === "GET") return kindleRead(request, env, user, accountSession, account, decodeURIComponent(readMatch[1]), decodeURIComponent(readMatch[2]), Math.max(1, Number.parseInt(readMatch[3], 10)));
+  const bookMatch = url.pathname.match(/^\/k\/book\/([^/]+)(?:\/toc)?$/u);
+  if (bookMatch && request.method === "GET") return kindleBookDetail(request, env, user, account, decodeURIComponent(bookMatch[1]));
+  const readMatch = url.pathname.match(/^\/k\/read\/([^/]+)\/([^/]+)(?:\/([0-9]+))?$/u);
+  if (readMatch && request.method === "GET") return kindleRead(request, env, user, accountSession, account, decodeURIComponent(readMatch[1]), decodeURIComponent(readMatch[2]), readMatch[3] ? Math.max(1, Number.parseInt(readMatch[3], 10)) : null);
   if (url.pathname.startsWith("/k/words")) await touchAccountActivity(env, account.account_id);
   if (url.pathname === "/k/words" && request.method === "GET") return kindleWordsV2Home(env, user, accountSession, url);
   if (url.pathname === "/k/words/setup" && ["GET", "POST"].includes(request.method)) return kindleWordsSetup(request, env, user, accountSession);
@@ -4925,9 +4869,10 @@ async function recordRequestFailure(request, env, error) {
 }
 
 async function handleRequest(request, env) {
-  if (!env.DB) return errorPage(503, "数据库尚未连接", "本地数据库尚未准备完成，请稍后重试。");
   const url = new URL(request.url);
   const path = url.pathname;
+  if ((path === "/kindle.css" || path === "/book-reader.js") && env.ASSETS) return env.ASSETS.fetch(request);
+  if (!env.DB) return errorPage(503, "数据库尚未连接", "本地数据库尚未准备完成，请稍后重试。");
   if (path === "/") return redirect("/k");
   if (path === "/health") return new Response("ok", { headers: { "cache-control": "no-store" } });
   if (path === "/device-test" && request.method === "GET") return deviceTest(request, env, url);

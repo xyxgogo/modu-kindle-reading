@@ -76,9 +76,41 @@ const bucket = {
   },
 };
 
+const assetContentTypes = Object.freeze({
+  ".css": "text/css; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".html": "text/html; charset=utf-8",
+  ".svg": "image/svg+xml",
+});
+
+const localAssets = {
+  async fetch(request) {
+    const pathname = new URL(request.url).pathname;
+    const relative = pathname.replace(/^\/+/, "");
+    const target = resolve(projectRoot, "public", relative);
+    const publicRoot = resolve(projectRoot, "public");
+    if (!target.startsWith(publicRoot)) return new Response("Not found", { status: 404 });
+    try {
+      const bytes = await readFile(target);
+      const extension = target.slice(target.lastIndexOf(".")).toLocaleLowerCase("en-US");
+      return new Response(request.method === "HEAD" ? null : bytes, {
+        headers: {
+          "cache-control": "public, max-age=3600",
+          "content-type": assetContentTypes[extension] || "application/octet-stream",
+          "x-content-type-options": "nosniff",
+        },
+      });
+    } catch (error) {
+      if (error?.code === "ENOENT") return new Response("Not found", { status: 404 });
+      throw error;
+    }
+  },
+};
+
 const env = {
   DB: new SqliteDatabase(sqlite),
   BUCKET: bucket,
+  ASSETS: localAssets,
   SESSION_SECRET: localSecret("SESSION_SECRET"),
   CSRF_SECRET: localSecret("CSRF_SECRET"),
   DEVICE_TOKEN_SECRET: localSecret("DEVICE_TOKEN_SECRET"),

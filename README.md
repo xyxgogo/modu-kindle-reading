@@ -24,7 +24,7 @@
 - `tests/`：学习引擎、迁移、阅读排版和封面回归测试。
 - `local-data/`：本地数据库、上传文件和备份；不会提交 Git。
 
-生产架构只面向 Cloudflare Workers + D1 + R2。历史 `netlify/` 与 `netlify.toml` 仅保留旧账户首次登录验证桥，不作为新功能目标，也不参与常规构建。
+生产架构只面向 Cloudflare Workers + D1 + R2。历史 `netlify/` 与 `netlify.toml` 仅作为归档资料，不参与登录、构建、运行或部署；产品没有任何 Netlify 运行时依赖。
 
 ## 本地运行
 

@@ -12,8 +12,10 @@
   ],
   "compatibility_date": "2026-08-13",
   "compatibility_flags": ["nodejs_compat"],
-  "vars": {
-    "LEGACY_AUTH_URL": "https://modu-kindle-reading.netlify.app/__modu_migration_auth"
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": true
   },
   "d1_databases": [
     {
@@ -35,8 +37,7 @@
       "CSRF_SECRET",
       "DEVICE_TOKEN_SECRET",
       "ADMIN_USERNAME",
-      "ADMIN_PASSWORD",
-      "LEGACY_MIGRATION_SECRET"
+      "ADMIN_PASSWORD"
     ]
   },
   "observability": {
