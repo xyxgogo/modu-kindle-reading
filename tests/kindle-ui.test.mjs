@@ -138,9 +138,16 @@ test("Kindle 阅读采用 kindle2 自适应分页、双列书架且默认显示�
 
 test("Kindle 登录在 200 页面保存账户 Cookie 后再自动跳转", async () => {
   const source = await readFile(resolve("worker", "index.js"), "utf8");
-  assert.match(source, /function accountSessionBootstrapResponse\(token, target\)/u);
-  assert.match(source, /return accountSessionBootstrapResponse\(created\.token, returnTo\)/u);
-  assert.match(source, /return accountSessionBootstrapResponse\(created\.token, "\/k\/home\?notice=registered"\)/u);
+  assert.match(source, /function accountSessionBootstrapResponse\(token, target, request\)/u);
+  assert.match(source, /return accountSessionBootstrapResponse\(created\.token, returnTo, request\)/u);
+  assert.match(source, /return accountSessionBootstrapResponse\(created\.token, "\/k\/home\?notice=registered", request\)/u);
   assert.match(source, /<meta http-equiv="refresh" content="0;url=\$\{escapeHtml\(safeTarget\)\}">/u);
   assert.doesNotMatch(source, /return redirect\(returnTo, \{ "set-cookie": accountCookie\(created\.token\) \}\)/u);
+});
+
+test("Kindle/3.0 使用设备测试已验证的兼容 Cookie，正式流量固定到唯一域名", async () => {
+  const source = await readFile(resolve("worker", "index.js"), "utf8");
+  assert.match(source, /return isKindleEinkRequest\(request\) \? base : `\$\{base\}; HttpOnly; Secure`/u);
+  assert.match(source, /const CANONICAL_HOST = "modu\.1005205\.xyz"/u);
+  assert.match(source, /return Response\.redirect\(url\.toString\(\), 308\)/u);
 });

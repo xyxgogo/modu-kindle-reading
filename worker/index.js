@@ -22,6 +22,7 @@ const COOKIE_ACCOUNT = "modu_account_session";
 const COOKIE_TEST = "modu_cookie_test";
 const COOKIE_TEST_CSRF = "modu_test_csrf";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 180;
+const CANONICAL_HOST = "modu.1005205.xyz";
 // Cloudflare Workers currently rejects PBKDF2 iteration counts above 100,000.
 const PASSWORD_ITERATIONS = 100000;
 const KINDLE_SAFE_QUESTION_TYPES = [
@@ -143,14 +144,22 @@ function validatePassword(raw) {
   return { value };
 }
 
-function accountCookie(token) {
-  // SameSite is intentionally omitted for the Kindle 3 browser. Its WebKit
-  // cookie parser predates that attribute and may reject the entire cookie.
-  return `${COOKIE_ACCOUNT}=${encodeURIComponent(token)}; Path=/; Max-Age=${60 * 60 * 24 * 30}; HttpOnly; Secure`;
+function isKindleEinkRequest(request) {
+  return detectKindleDevice(request).type === "kindle-eink";
 }
 
-function clearAccountCookie() {
-  return `${COOKIE_ACCOUNT}=; Path=/; Max-Age=0; HttpOnly; Secure`;
+function accountCookie(token, request) {
+  const base = `${COOKIE_ACCOUNT}=${encodeURIComponent(token)}; Path=/; Max-Age=${60 * 60 * 24 * 30}; SameSite=Lax`;
+  // The Kindle/3.0 browser used by the product accepts the simple cookie used
+  // by /device-test, but drops the account cookie when Secure/HttpOnly are
+  // present. Keep those protections for modern browsers and use the proven
+  // first-party compatibility form only for an actual Kindle E-Ink UA.
+  return isKindleEinkRequest(request) ? base : `${base}; HttpOnly; Secure`;
+}
+
+function clearAccountCookie(request) {
+  const base = `${COOKIE_ACCOUNT}=; Path=/; Max-Age=0; SameSite=Lax`;
+  return isKindleEinkRequest(request) ? base : `${base}; HttpOnly; Secure`;
 }
 
 function fontScaleConfig(value) {
@@ -825,7 +834,7 @@ function safeAccountReturnTo(raw, fallback = "/k/home") {
   return fallback;
 }
 
-function accountSessionBootstrapResponse(token, target) {
+function accountSessionBootstrapResponse(token, target, request) {
   const safeTarget = safeAccountReturnTo(target);
   // Older Kindle WebKit builds can ignore Set-Cookie on a 3xx response.
   // Persist the first-party account cookie on a normal 200 response, then
@@ -835,7 +844,7 @@ function accountSessionBootstrapResponse(token, target) {
     brand: false,
     extraHead: `<meta http-equiv="refresh" content="0;url=${escapeHtml(safeTarget)}">`,
     body: `<div class="session-bootstrap"><p>登录成功，正在进入墨读……</p><a class="button" href="${escapeHtml(safeTarget)}">点击进入墨读</a></div>`,
-  }), 200, { "set-cookie": accountCookie(token) });
+  }), 200, { "set-cookie": accountCookie(token, request) });
 }
 
 async function accountEntryPage(env, url) {
@@ -886,7 +895,7 @@ async function accountLogin(request, env, url, deviceSession) {
       await env.DB.prepare(`UPDATE device_sessions SET current_user_id = ?, updated_at = datetime('now') WHERE id = ?`)
         .bind(account.user_id, deviceSession.id).run();
     }
-    return accountSessionBootstrapResponse(created.token, returnTo);
+    return accountSessionBootstrapResponse(created.token, returnTo, request);
   }
   return htmlResponse(layout({
     title: "账户登录",
@@ -979,13 +988,13 @@ async function accountRegister(request, env, url, deviceSession) {
   }
   await env.DB.batch(statements);
   const created = await createAccountSession(env, accountId);
-  return accountSessionBootstrapResponse(created.token, "/k/home?notice=registered");
+  return accountSessionBootstrapResponse(created.token, "/k/home?notice=registered", request);
 }
 
 async function accountLogout(request, env) {
   const token = parseCookies(request)[COOKIE_ACCOUNT];
   if (token) await env.DB.prepare(`DELETE FROM account_sessions WHERE session_token_hash = ?`).bind(await sha256(token)).run();
-  return redirect("/k?notice=logged_out", { "set-cookie": clearAccountCookie() });
+  return redirect("/k?notice=logged_out", { "set-cookie": clearAccountCookie(request) });
 }
 
 function parentNavigation() {
@@ -4883,6 +4892,12 @@ async function recordRequestFailure(request, env, error) {
 
 async function handleRequest(request, env) {
   const url = new URL(request.url);
+  if (![CANONICAL_HOST, "localhost", "127.0.0.1"].includes(url.hostname)) {
+    url.protocol = "https:";
+    url.hostname = CANONICAL_HOST;
+    url.port = "";
+    return Response.redirect(url.toString(), 308);
+  }
   const path = url.pathname;
   if ((path === "/kindle.css" || path === "/book-reader.js") && env.ASSETS) return env.ASSETS.fetch(request);
   if (!env.DB) return errorPage(503, "数据库尚未连接", "本地数据库尚未准备完成，请稍后重试。");
