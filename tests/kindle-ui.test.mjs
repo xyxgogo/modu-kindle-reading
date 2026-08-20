@@ -135,3 +135,12 @@ test("Kindle 阅读采用 kindle2 自适应分页、双列书架且默认显示�
   assert.doesNotMatch(source, /if \(!session \|\| session\.device_status !== "active"\) return createAutomaticDeviceSession/u);
   assert.match(source, /READING_PAGINATION_VERSION = 6/u);
 });
+
+test("Kindle 登录在 200 页面保存账户 Cookie 后再自动跳转", async () => {
+  const source = await readFile(resolve("worker", "index.js"), "utf8");
+  assert.match(source, /function accountSessionBootstrapResponse\(token, target\)/u);
+  assert.match(source, /return accountSessionBootstrapResponse\(created\.token, returnTo\)/u);
+  assert.match(source, /return accountSessionBootstrapResponse\(created\.token, "\/k\/home\?notice=registered"\)/u);
+  assert.match(source, /<meta http-equiv="refresh" content="0;url=\$\{escapeHtml\(safeTarget\)\}">/u);
+  assert.doesNotMatch(source, /return redirect\(returnTo, \{ "set-cookie": accountCookie\(created\.token\) \}\)/u);
+});

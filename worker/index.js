@@ -825,6 +825,19 @@ function safeAccountReturnTo(raw, fallback = "/k/home") {
   return fallback;
 }
 
+function accountSessionBootstrapResponse(token, target) {
+  const safeTarget = safeAccountReturnTo(target);
+  // Older Kindle WebKit builds can ignore Set-Cookie on a 3xx response.
+  // Persist the first-party account cookie on a normal 200 response, then
+  // continue with meta refresh. The large link remains a no-JS fallback.
+  return htmlResponse(layout({
+    title: "登录成功",
+    brand: false,
+    extraHead: `<meta http-equiv="refresh" content="0;url=${escapeHtml(safeTarget)}">`,
+    body: `<div class="session-bootstrap"><p>登录成功，正在进入墨读……</p><a class="button" href="${escapeHtml(safeTarget)}">点击进入墨读</a></div>`,
+  }), 200, { "set-cookie": accountCookie(token) });
+}
+
 async function accountEntryPage(env, url) {
   const weather = await weatherBlock(env);
   const notice = {
@@ -873,7 +886,7 @@ async function accountLogin(request, env, url, deviceSession) {
       await env.DB.prepare(`UPDATE device_sessions SET current_user_id = ?, updated_at = datetime('now') WHERE id = ?`)
         .bind(account.user_id, deviceSession.id).run();
     }
-    return redirect(returnTo, { "set-cookie": accountCookie(created.token) });
+    return accountSessionBootstrapResponse(created.token, returnTo);
   }
   return htmlResponse(layout({
     title: "账户登录",
@@ -966,7 +979,7 @@ async function accountRegister(request, env, url, deviceSession) {
   }
   await env.DB.batch(statements);
   const created = await createAccountSession(env, accountId);
-  return redirect("/k/home?notice=registered", { "set-cookie": accountCookie(created.token) });
+  return accountSessionBootstrapResponse(created.token, "/k/home?notice=registered");
 }
 
 async function accountLogout(request, env) {
