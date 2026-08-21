@@ -144,6 +144,8 @@ test("Kindle 阅读采用 kindle2 自适应分页、双列书架且默认显示�
   assert.match(source, /if \(url\.pathname === "\/k\/settings"\) return redirect\("\/k\/home"\)/u);
   assert.match(source, /modu_ui_font_size_v1/u);
   assert.match(source, /function uiFontControls/u);
+  assert.match(source, /\.ui-size-medium \.tile-grid \.home-tile \{ font-size: 35px; \}/u);
+  assert.match(source, /\.ui-size-medium nav a \{ font-size: 36px; \}/u);
   assert.doesNotMatch(source, /if \(!session \|\| session\.device_status !== "active"\) return createAutomaticDeviceSession/u);
   assert.match(source, /READING_PAGINATION_VERSION = 6/u);
 });

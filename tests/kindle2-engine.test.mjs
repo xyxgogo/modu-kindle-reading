@@ -38,6 +38,7 @@ test("formal MODU data renders through the Kindle shelf and TOC without fixtures
   assert.match(shelf, /继续阅读/);
   assert.match(shelf, /回到主页/);
   assert.match(shelf, /我的收藏/);
+  assert.match(shelf, /library-header-line/);
   assert.doesNotMatch(shelf, /全部书籍/);
   assert.match(shelf, /正式读物/);
   assert.match(shelf, /\/k\/cover\/book-1/);

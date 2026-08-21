@@ -712,7 +712,10 @@ function baseStyles() {
     .ui-size-small .weather-cell:nth-child(2), .ui-size-medium .weather-cell:nth-child(2), .ui-size-large .weather-cell:nth-child(2) { font-size: .86em; }
     .ui-size-small .weather-note, .ui-size-medium .weather-note, .ui-size-large .weather-note { font-size: .6em; }
     .ui-size-small .greeting, .ui-size-medium .greeting, .ui-size-large .greeting { font-size: 1em; }
-    .ui-size-small .home-tile, .ui-size-medium .home-tile, .ui-size-large .home-tile { min-height: 230px; font-size: .8em; }
+    .ui-size-small .home-tile, .ui-size-medium .home-tile, .ui-size-large .home-tile { min-height: 230px; }
+    .ui-size-small .tile-grid .home-tile { font-size: 29px; }
+    .ui-size-medium .tile-grid .home-tile { font-size: 35px; }
+    .ui-size-large .tile-grid .home-tile { font-size: 42px; }
     .ui-size-small .home-tile h2, .ui-size-medium .home-tile h2, .ui-size-large .home-tile h2 { font-size: 1.2em; }
     .ui-size-small .home-tile .tile-status, .ui-size-medium .home-tile .tile-status, .ui-size-large .home-tile .tile-status { font-size: .68em; }
     .ui-size-small .summary-head strong, .ui-size-medium .summary-head strong, .ui-size-large .summary-head strong { font-size: .92em; }
@@ -730,7 +733,9 @@ function baseStyles() {
     .ui-size-small input[type="number"], .ui-size-medium input[type="number"], .ui-size-large input[type="number"],
     .ui-size-small textarea, .ui-size-medium textarea, .ui-size-large textarea,
     .ui-size-small select, .ui-size-medium select, .ui-size-large select { font-size: .82em; }
-    .ui-size-small nav a, .ui-size-medium nav a, .ui-size-large nav a { font-size: .82em; }
+    .ui-size-small nav a { font-size: 30px; }
+    .ui-size-medium nav a { font-size: 36px; }
+    .ui-size-large nav a { font-size: 43px; }
     .ui-size-small table, .ui-size-medium table, .ui-size-large table { font-size: .68em; }
     .ui-size-small .study-screen h1, .ui-size-medium .study-screen h1, .ui-size-large .study-screen h1 { font-size: 1.25em; }
   `;
@@ -4123,7 +4128,7 @@ async function kindleWordsV2Home(env, user, session, url) {
         <input type="submit" value="${Number(counts?.open_sessions || 0) ? "继续学习" : "开始学习"}">
       </form><a class="button" href="/k/words/progress">学习进度</a></div>
       <section class="card"><strong>学习状态</strong><p>初识 ${Number(counts?.initial_words || 0)}　·　熟悉 ${Number(counts?.familiar_words || 0)}　·　掌握 ${Number(counts?.mastered_words || 0)}　·　今日 ${Number(counts?.today_events || 0)}</p></section>`,
-    nav: '<a href="/k/records">历史记录</a> | <a href="/k/home">个人主页</a>',
+    nav: '<a href="/k/records">历史记录</a> | <a href="/k/home">回到主页</a>',
   }));
 }
 
@@ -4747,7 +4752,7 @@ async function kindleRecords(env, user) {
       最近学习：${escapeHtml(formatShanghaiTime(summary?.latest, "尚未开始"))}<br>
       最近阅读：${latestReading ? `${escapeHtml(latestReading.title)} · ${escapeHtml(latestReading.chapter_title || "正文")} · 第 ${Number(latestReading.page)} 页` : "尚无记录"}</p></section>
       <table><thead><tr><th>开始时间</th><th>题数</th><th>正确率</th><th>状态</th></tr></thead><tbody>${rows || '<tr><td colspan="4">暂无记录。</td></tr>'}</tbody></table>`,
-    nav: '<a href="/k/mistakes">错题本</a> | <a href="/k/words">单词</a> | <a href="/k/home">个人主页</a>',
+    nav: '<a href="/k/mistakes">错题本</a> | <a href="/k/words">单词</a> | <a href="/k/home">回到主页</a>',
   }));
 }
 

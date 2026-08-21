@@ -129,8 +129,10 @@ export function renderKindleLibrary({ device, books, scope = "all" }) {
     : `<p class="empty-message">${scope === "continue" ? "还没有阅读记录。" : scope === "favorites" ? "还没有收藏读物。" : "书架暂时为空。"}</p>`;
   const body = `<main class="page selected-library">
   <header class="page-header">
-    <h1>书架</h1>
-    <p class="library-scopes">${continueControl}　<a href="/k/home">回到主页</a>　${favoriteControl}</p>
+    <table class="library-header-line"><tbody><tr>
+      <td class="library-header-title"><h1>书架</h1></td>
+      <td class="library-header-actions"><p class="library-scopes">${continueControl}　<a href="/k/home">回到主页</a>　${favoriteControl}</p></td>
+    </tr></tbody></table>
   </header>
   ${shelf}
 </main>`;
