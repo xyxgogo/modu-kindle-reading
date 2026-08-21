@@ -1,4 +1,4 @@
-export const WEB_STYLESHEET_HREF = "/web.css?v=20260821-1";
+export const WEB_STYLESHEET_HREF = "/web.css?v=20260821-2";
 export const WEB_SCRIPT_SRC = "/web-ui.js?v=20260821-1";
 
 export function isWebUiPath(pathname) {

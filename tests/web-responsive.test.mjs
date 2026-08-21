@@ -105,3 +105,17 @@ test("Web CSS 覆盖手机、Pad、学习页和满屏阅读器", async () => {
   assert.match(worker, /adaptResponseForWeb/u);
   assert.match(worker, /"\/web\.css", "\/web-ui\.js"/u);
 });
+
+test("Web 卡片和底部导航不会从零字号父容器继承出零字号", async () => {
+  const css = await readFile("public/web.css", "utf8");
+  assert.match(css, /body\.ui-size-medium \.tile-grid \.home-tile \{ font-size: 18px; \}/u);
+  assert.match(css, /body\.ui-size-medium nav a \{ font-size: 18px; \}/u);
+  assert.doesNotMatch(css, /\.tile-grid \.home-tile[\s\S]{0,420}font-size: 1em;/u);
+});
+
+test("手机阅读顶部栏压缩字号控件并把进度拆成两行", async () => {
+  const css = await readFile("public/web.css", "utf8");
+  assert.match(css, /td\.font-controls \{[\s\S]*?width: 38%;[\s\S]*?font-size: 0;/u);
+  assert.match(css, /\.font-controls \.font-size-current \{[\s\S]*?min-width: 32px;[\s\S]*?font-size: 14px;/u);
+  assert.match(css, /\.reader-progress-cell span \{[\s\S]*?display: block;[\s\S]*?font-size: 10px;/u);
+});
