@@ -1,0 +1,325 @@
+/* Non-Kindle presentation layer. This file is never linked for Kindle E-Ink. */
+html.web-client {
+  background: #fff;
+  color: #171717;
+  font-family: Arial, "Microsoft YaHei", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html.web-client body,
+html.web-client.ink-mode body {
+  background: #fff;
+  color: #171717;
+  font-family: Arial, "Microsoft YaHei", sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+html.web-client body.ui-size-small { font-size: 16px; }
+html.web-client body.ui-size-medium { font-size: 18px; }
+html.web-client body.ui-size-large { font-size: 21px; }
+
+html.web-client.kindle main {
+  max-width: 980px;
+  padding: 18px 18px 32px;
+}
+
+html.web-client.kindle h1,
+html.web-client.kindle .ui-size-small h1,
+html.web-client.kindle .ui-size-medium h1,
+html.web-client.kindle .ui-size-large h1 { font-size: 2em; line-height: 1.2; }
+
+html.web-client.kindle h2,
+html.web-client.kindle .ui-size-small h2,
+html.web-client.kindle .ui-size-medium h2,
+html.web-client.kindle .ui-size-large h2 { font-size: 1.45em; line-height: 1.25; }
+
+html.web-client.kindle h3,
+html.web-client.kindle .ui-size-small h3,
+html.web-client.kindle .ui-size-medium h3,
+html.web-client.kindle .ui-size-large h3 { font-size: 1.2em; }
+
+html.web-client.kindle .muted,
+html.web-client.kindle .ui-size-small .muted,
+html.web-client.kindle .ui-size-medium .muted,
+html.web-client.kindle .ui-size-large .muted { font-size: .9em; }
+
+html.web-client.kindle .ui-font-controls { margin-bottom: 12px; }
+html.web-client.kindle .ui-font-controls span { font-size: 1em; }
+html.web-client.kindle .ui-font-controls button,
+html.web-client.kindle .ui-size-small .ui-font-controls button,
+html.web-client.kindle .ui-size-medium .ui-font-controls button,
+html.web-client.kindle .ui-size-large .ui-font-controls button {
+  min-height: 44px;
+  min-width: 48px;
+  margin-left: 5px;
+  padding: 6px 9px;
+  font-size: 1em;
+}
+
+html.web-client.kindle .brand { margin-bottom: 18px; padding-bottom: 10px; }
+html.web-client.kindle .brand strong,
+html.web-client.kindle .ui-size-small .brand strong,
+html.web-client.kindle .ui-size-medium .brand strong,
+html.web-client.kindle .ui-size-large .brand strong { font-size: 1.8em; }
+
+html.web-client.kindle .topbar { margin-bottom: 16px; }
+html.web-client.kindle .topbar-brand strong,
+html.web-client.kindle .ui-size-small .topbar-brand strong,
+html.web-client.kindle .ui-size-medium .topbar-brand strong,
+html.web-client.kindle .ui-size-large .topbar-brand strong { font-size: 2em; }
+html.web-client.kindle .topbar-brand span,
+html.web-client.kindle .ui-size-small .topbar-brand span,
+html.web-client.kindle .ui-size-medium .topbar-brand span,
+html.web-client.kindle .ui-size-large .topbar-brand span { font-size: .85em; }
+html.web-client.kindle .top-link,
+html.web-client.kindle .ui-size-small .top-link,
+html.web-client.kindle .ui-size-medium .top-link,
+html.web-client.kindle .ui-size-large .top-link { min-height: 44px; margin-left: 12px; font-size: 1em; }
+
+html.web-client.kindle .weather-strip { min-height: 76px; margin-bottom: 18px; padding: 10px 14px; }
+html.web-client.kindle .weather-cell,
+html.web-client.kindle .ui-size-small .weather-cell,
+html.web-client.kindle .ui-size-medium .weather-cell,
+html.web-client.kindle .ui-size-large .weather-cell { font-size: .9em; }
+html.web-client.kindle .weather-cell:nth-child(2),
+html.web-client.kindle .ui-size-small .weather-cell:nth-child(2),
+html.web-client.kindle .ui-size-medium .weather-cell:nth-child(2),
+html.web-client.kindle .ui-size-large .weather-cell:nth-child(2) { font-size: 1.1em; }
+html.web-client.kindle .weather-note,
+html.web-client.kindle .ui-size-small .weather-note,
+html.web-client.kindle .ui-size-medium .weather-note,
+html.web-client.kindle .ui-size-large .weather-note { font-size: .78em; }
+html.web-client.kindle .greeting,
+html.web-client.kindle .ui-size-small .greeting,
+html.web-client.kindle .ui-size-medium .greeting,
+html.web-client.kindle .ui-size-large .greeting { font-size: 1.35em; }
+
+html.web-client.kindle .tile-grid { margin: -6px; }
+html.web-client.kindle .tile-grid .home-tile,
+html.web-client.kindle .ui-size-small .tile-grid .home-tile,
+html.web-client.kindle .ui-size-medium .tile-grid .home-tile,
+html.web-client.kindle .ui-size-large .tile-grid .home-tile {
+  width: calc(50% - 12px);
+  min-height: 174px;
+  margin: 6px;
+  padding: 18px;
+  font-size: 1em;
+}
+html.web-client.kindle .home-tile h2,
+html.web-client.kindle .ui-size-small .home-tile h2,
+html.web-client.kindle .ui-size-medium .home-tile h2,
+html.web-client.kindle .ui-size-large .home-tile h2 { font-size: 1.35em; }
+html.web-client.kindle .home-tile .tile-status,
+html.web-client.kindle .ui-size-small .home-tile .tile-status,
+html.web-client.kindle .ui-size-medium .home-tile .tile-status,
+html.web-client.kindle .ui-size-large .home-tile .tile-status { left: 18px; bottom: 14px; font-size: .82em; }
+
+html.web-client.kindle .card { margin: 12px 0; padding: 16px; }
+html.web-client.kindle .menu-card,
+html.web-client.kindle .ui-size-small .menu-card,
+html.web-client.kindle .ui-size-medium .menu-card,
+html.web-client.kindle .ui-size-large .menu-card {
+  min-height: 100px;
+  padding: 18px 54px 16px 72px;
+}
+html.web-client.kindle .menu-card .menu-icon { left: 20px; top: 22px; font-size: 1.25em; }
+html.web-client.kindle .menu-card .menu-arrow { right: 18px; top: 32px; }
+html.web-client.kindle .menu-card strong,
+html.web-client.kindle .ui-size-small .menu-card strong,
+html.web-client.kindle .ui-size-medium .menu-card strong,
+html.web-client.kindle .ui-size-large .menu-card strong { font-size: 1.25em; }
+
+html.web-client.kindle .button,
+html.web-client.kindle button,
+html.web-client.kindle input[type="submit"],
+html.web-client.kindle .ui-size-small .button,
+html.web-client.kindle .ui-size-medium .button,
+html.web-client.kindle .ui-size-large .button,
+html.web-client.kindle .ui-size-small button,
+html.web-client.kindle .ui-size-medium button,
+html.web-client.kindle .ui-size-large button,
+html.web-client.kindle .ui-size-small input[type="submit"],
+html.web-client.kindle .ui-size-medium input[type="submit"],
+html.web-client.kindle .ui-size-large input[type="submit"] {
+  min-height: 48px;
+  margin: 10px 0;
+  padding: 10px 12px;
+  font-size: 1em;
+}
+
+html.web-client.kindle input[type="text"],
+html.web-client.kindle input[type="password"],
+html.web-client.kindle input[type="number"],
+html.web-client.kindle textarea,
+html.web-client.kindle select,
+html.web-client.kindle .ui-size-small input,
+html.web-client.kindle .ui-size-medium input,
+html.web-client.kindle .ui-size-large input,
+html.web-client.kindle .ui-size-small textarea,
+html.web-client.kindle .ui-size-medium textarea,
+html.web-client.kindle .ui-size-large textarea,
+html.web-client.kindle .ui-size-small select,
+html.web-client.kindle .ui-size-medium select,
+html.web-client.kindle .ui-size-large select {
+  min-height: 46px;
+  padding: 8px 10px;
+  font-size: 1em;
+}
+
+html.web-client.kindle .study-screen {
+  height: auto;
+  min-height: 100vh;
+  overflow: visible;
+}
+html.web-client.kindle .study-screen h1,
+html.web-client.kindle .ui-size-small .study-screen h1,
+html.web-client.kindle .ui-size-medium .study-screen h1,
+html.web-client.kindle .ui-size-large .study-screen h1 { font-size: 2em; }
+html.web-client.kindle .study-screen .card { margin: 10px 0; padding: 14px; }
+
+html.web-client.kindle nav { margin-top: 18px; padding-top: 10px; }
+html.web-client.kindle nav a,
+html.web-client.kindle .ui-size-small nav a,
+html.web-client.kindle .ui-size-medium nav a,
+html.web-client.kindle .ui-size-large nav a {
+  min-width: 30%;
+  min-height: 48px;
+  margin: 5px 1%;
+  padding: 10px 8px;
+  font-size: 1em;
+}
+
+html.web-client.kindle table {
+  max-width: 100%;
+  font-size: .9em;
+}
+html.web-client.kindle main > table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+html.web-client.kindle th,
+html.web-client.kindle td { padding: 7px; }
+
+/* Shelf and table-of-contents pages from the frozen Kindle engine. */
+html.web-client .page { max-width: 980px; padding: 16px; }
+html.web-client .page-header { margin-bottom: 18px; padding-bottom: 10px; }
+html.web-client .page h1 { font-size: 2em; }
+html.web-client .page h2 { font-size: 1.45em; }
+html.web-client .library-header-title { width: 18%; }
+html.web-client .library-scopes { font-size: .95em; }
+html.web-client .book-cell,
+html.web-client.ink-mode .book-cell { padding: 7px; font-size: 1em; }
+html.web-client .selected-bookshelf img { width: 68%; }
+html.web-client .text-link,
+html.web-client.ink-mode .text-link { min-height: 44px; padding: 7px 0; }
+html.web-client .block-link,
+html.web-client.ink-mode .block-link { min-height: 48px; padding: 10px 12px; }
+html.web-client .book-toc a,
+html.web-client.ink-mode .book-toc a { min-height: 48px; padding: 10px 6px; }
+
+/* Full-viewport paginated reader; book-reader.js remains unchanged. */
+html.web-client body.book-reader-page,
+html.web-client .book-reader {
+  height: 100vh;
+  height: 100dvh;
+}
+html.web-client body.book-reader-page { overflow: hidden; }
+html.web-client .book-reader { max-width: 980px; margin: 0 auto; }
+html.web-client .book-reader-top { height: 54px; padding: 0 3px; }
+html.web-client .book-reader-top td { height: 52px; padding: 0 2px; font-size: 14px; }
+html.web-client .reader-home-cell { width: 22%; }
+html.web-client .font-controls { width: 43%; }
+html.web-client .reader-progress-cell { width: 35%; font-size: 12px; }
+html.web-client .book-reader-top a { min-height: 42px; padding: 11px 0; }
+html.web-client .font-controls .font-size-control,
+html.web-client .font-controls .font-size-current { min-height: 42px; min-width: 36px; padding: 11px 6px; }
+html.web-client .book-page-text {
+  height: calc(100vh - 114px);
+  height: calc(100dvh - 114px);
+  padding: 5px 12px 0;
+  line-height: 1.55;
+}
+html.web-client .book-size-48 .book-page-text { font-size: 19px; }
+html.web-client .book-size-56 .book-page-text { font-size: 22px; }
+html.web-client .book-size-64 .book-page-text { font-size: 25px; }
+html.web-client .book-page-nav { height: 60px; }
+html.web-client .book-page-nav td { height: 58px; padding: 0 1px; font-size: 15px; }
+html.web-client .book-page-nav a,
+html.web-client .book-page-nav span,
+html.web-client .book-page-nav button { height: 56px; min-height: 56px; padding: 17px 1px; }
+
+@media (max-width: 599px) {
+  html.web-client.kindle main { padding: 12px 12px 24px; }
+  html.web-client.kindle .topbar-brand span { max-width: 230px; }
+  html.web-client.kindle .weather-strip { padding: 8px; }
+  html.web-client.kindle .weather-cell:first-child { width: 27%; }
+  html.web-client.kindle .weather-cell:nth-child(2) { width: 35%; }
+  html.web-client.kindle .weather-cell:last-child { width: 38%; font-size: .78em; }
+  html.web-client.kindle .tile-grid { margin: 0; }
+  html.web-client.kindle .tile-grid .home-tile,
+  html.web-client.kindle .ui-size-small .tile-grid .home-tile,
+  html.web-client.kindle .ui-size-medium .tile-grid .home-tile,
+  html.web-client.kindle .ui-size-large .tile-grid .home-tile {
+    display: block;
+    width: 100%;
+    min-height: 142px;
+    margin: 10px 0;
+    padding: 16px;
+  }
+  html.web-client.kindle .home-tile .tile-copy { width: 72%; }
+  html.web-client.kindle .today-summary { margin-top: 16px; }
+  html.web-client.kindle .summary-head { padding: 10px 12px; }
+  html.web-client.kindle .summary-row { padding: 10px 2px; }
+  html.web-client.kindle .summary-head strong,
+  html.web-client.kindle .summary-head a,
+  html.web-client.kindle .summary-item strong,
+  html.web-client.kindle .summary-item span { font-size: 1em; }
+  html.web-client.kindle .study-actions,
+  html.web-client.kindle .study-actions form,
+  html.web-client.kindle .study-actions .button { display: block; width: 100%; }
+  html.web-client.kindle nav a,
+  html.web-client.kindle .ui-size-small nav a,
+  html.web-client.kindle .ui-size-medium nav a,
+  html.web-client.kindle .ui-size-large nav a { min-width: 46%; }
+  html.web-client .page { padding: 10px; }
+  html.web-client .library-header-line,
+  html.web-client .library-header-line tbody,
+  html.web-client .library-header-line tr,
+  html.web-client .library-header-title,
+  html.web-client .library-header-actions { display: block; width: 100%; text-align: left; }
+  html.web-client .library-header-title h1 { margin-bottom: 8px; }
+  html.web-client .library-scopes { font-size: 14px; white-space: normal; }
+  html.web-client .selected-bookshelf img { width: 84%; }
+  html.web-client .book-reader-top td { font-size: 12px; }
+  html.web-client .reader-progress-cell { font-size: 10px; }
+  html.web-client .book-page-nav td { font-size: 13px; }
+}
+
+@media (min-width: 768px) {
+  html.web-client body,
+  html.web-client.ink-mode body { font-size: 21px; }
+  html.web-client body.ui-size-small { font-size: 18px; }
+  html.web-client body.ui-size-medium { font-size: 21px; }
+  html.web-client body.ui-size-large { font-size: 24px; }
+  html.web-client .book-reader-top { height: 62px; }
+  html.web-client .book-reader-top td { height: 60px; font-size: 16px; }
+  html.web-client .reader-progress-cell { font-size: 14px; }
+  html.web-client .book-page-text {
+    height: calc(100vh - 128px);
+    height: calc(100dvh - 128px);
+    padding-right: 24px;
+    padding-left: 24px;
+    line-height: 1.5;
+  }
+  html.web-client .book-size-48 .book-page-text { font-size: 22px; }
+  html.web-client .book-size-56 .book-page-text { font-size: 26px; }
+  html.web-client .book-size-64 .book-page-text { font-size: 30px; }
+  html.web-client .book-page-nav { height: 66px; }
+  html.web-client .book-page-nav td { height: 64px; font-size: 18px; }
+  html.web-client .book-page-nav a,
+  html.web-client .book-page-nav span,
+  html.web-client .book-page-nav button { height: 62px; min-height: 62px; padding: 18px 2px; }
+}

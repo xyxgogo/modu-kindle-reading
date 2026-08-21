@@ -15,6 +15,7 @@ import {
   scaleForKindleSize,
   selectedKindleSize,
 } from "../src/kindle/engine.mjs";
+import { adaptResponseForWeb } from "../src/web/response-adapter.mjs";
 
 const COOKIE_DEVICE = "modu_device_session";
 const COOKIE_ADMIN = "modu_admin_session";
@@ -4965,7 +4966,7 @@ async function handleRequest(request, env) {
     return Response.redirect(url.toString(), 308);
   }
   const path = url.pathname;
-  if ((path === "/kindle.css" || path === "/book-reader.js") && env.ASSETS) return env.ASSETS.fetch(request);
+  if (["/kindle.css", "/book-reader.js", "/web.css", "/web-ui.js"].includes(path) && env.ASSETS) return env.ASSETS.fetch(request);
   if (!env.DB) return errorPage(503, "数据库尚未连接", "本地数据库尚未准备完成，请稍后重试。");
   if (path === "/") return redirect("/k");
   if (path === "/health") return new Response("ok", { headers: { "cache-control": "no-store" } });
@@ -4988,7 +4989,8 @@ export default {
     try {
       const response = await handleRequest(request, env);
       const url = new URL(request.url);
-      if (shouldRecordAccess(request, response, url)) {
+      const clientResponse = adaptResponseForWeb(request, response, detectKindleDevice(request).type);
+      if (shouldRecordAccess(request, clientResponse, url)) {
         ctx.waitUntil(recordAccessEvent(request, env, url).catch((error) => {
           console.error("access_event_failed", {
             path: url.pathname,
@@ -4997,7 +4999,7 @@ export default {
           });
         }));
       }
-      return response;
+      return clientResponse;
     } catch (error) {
       const path = new URL(request.url).pathname;
       console.error("request_failed", {
