@@ -197,16 +197,27 @@ h2 { font-size: 23px; line-height: 1.3; }
   line-height: 1.1;
   padding: 0 2px;
   text-align: center;
-  width: 33.333%;
+  width: 25%;
 }
 
 .book-page-nav a,
-.book-page-nav span {
+.book-page-nav span,
+.book-page-nav button {
   display: block;
+  background: #fff;
+  border: 0;
+  color: #000;
+  font: inherit;
   height: 72px;
   min-height: 72px;
   padding: 18px 0;
+  text-align: center;
+  text-decoration: underline;
+  width: 100%;
 }
+
+.favorite-form { margin: 0; }
+.favorite-form input[type="hidden"] { display: none; }
 
 .disabled-control { text-decoration: none; }
 

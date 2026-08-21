@@ -118,18 +118,19 @@ function shelfRows(books) {
 }
 
 export function renderKindleLibrary({ device, books, scope = "all" }) {
-  const labels = { continue: "继续阅读", all: "全部书籍", favorites: "收藏" };
-  const tabs = ["continue", "all", "favorites"].map((name) => name === scope
-    ? `<strong>${labels[name]}</strong>`
-    : `<a href="/k/library?scope=${name}">${labels[name]}</a>`).join("　");
+  const continueControl = scope === "continue"
+    ? "<strong>继续阅读</strong>"
+    : '<a href="/k/library?scope=continue">继续阅读</a>';
+  const favoriteControl = scope === "favorites"
+    ? "<strong>我的收藏</strong>"
+    : '<a href="/k/library?scope=favorites">我的收藏</a>';
   const shelf = books.length
     ? `<table class="bookshelf-table bookshelf-b1 selected-bookshelf"><tbody>${shelfRows(books)}</tbody></table>`
     : `<p class="empty-message">${scope === "continue" ? "还没有阅读记录。" : scope === "favorites" ? "还没有收藏读物。" : "书架暂时为空。"}</p>`;
   const body = `<main class="page selected-library">
   <header class="page-header">
-    <p><a class="text-link" href="/k/home">墨读</a></p>
     <h1>书架</h1>
-    <p class="library-scopes">${tabs}</p>
+    <p class="library-scopes">${continueControl}　<a href="/k/home">回到主页</a>　${favoriteControl}</p>
   </header>
   ${shelf}
 </main>`;
@@ -153,6 +154,7 @@ export function renderKindleToc({ device, book, chapters, continueHref }) {
 export function renderKindleReader({
   device, book, chapter, source, start, page, size, previous, previousChapterHref,
   nextChapterHref, pagesBefore, totalPages, bookLength, bookOffsetBefore,
+  isFavorite = false, favoriteCsrf = "", returnHref = "",
 }) {
   const fallbackCharacters = KINDLE_FALLBACK_CHARACTERS[size];
   const chunk = source.slice(start, start + 2000);
@@ -178,13 +180,20 @@ export function renderKindleReader({
   const initialCompleted = bookLength > 0 ? Math.max(0, Math.min(100, Math.floor((bookOffsetBefore + start) / bookLength * 100))) : 0;
   const body = `<main class="book-reader book-size-${size}">
   <header class="book-reader-top"><table><tbody><tr>
-    <td class="reader-home-cell"><a href="/k/library">书架</a></td>
+    <td class="reader-home-cell"><a href="/k/library">回到书架</a></td>
     <td class="font-controls" aria-label="正文字号">字体大小：${sizeControls}</td>
     <td class="reader-progress-cell"><span id="book-page-count">${absolutePage}页/共${Math.max(totalPages, absolutePage)}页</span>，<span id="book-progress">已完成 ${initialCompleted}%</span></td>
   </tr></tbody></table></header>
   <article id="book-page" class="book-page-text family-sans" data-start="${start}" data-page="${page}" data-absolute-page="${absolutePage}" data-size="${size}" data-length="${source.length}" data-book-length="${bookLength}" data-book-offset="${bookOffsetBefore}" data-total-pages="${Math.max(totalPages, absolutePage)}" data-next-chapter="${escapeKindleHtml(nextChapterHref || "")}" aria-label="${escapeKindleHtml(book.title)} ${escapeKindleHtml(chapter.title)} 第 ${page} 页">${escapeKindleHtml(fallbackText)}</article>
   <textarea id="book-source" class="book-source" aria-hidden="true">${escapeKindleHtml(chunk)}</textarea>
   <nav class="book-page-nav" aria-label="阅读翻页"><table><tbody><tr>
+    <td><form class="favorite-form" method="post" action="/k/books/favorite">
+      <input type="hidden" name="csrf_token" value="${escapeKindleHtml(favoriteCsrf)}">
+      <input type="hidden" name="book_id" value="${escapeKindleHtml(book.id)}">
+      <input type="hidden" name="favorite" value="${isFavorite ? "0" : "1"}">
+      <input type="hidden" name="return_to" value="${escapeKindleHtml(returnHref)}">
+      <button type="submit">${isFavorite ? "取消收藏" : "收藏"}</button>
+    </form></td>
     <td>${previousControl}</td>
     <td><a href="/k/book/${encodeURIComponent(book.id)}/toc">回到目录</a></td>
     <td>${nextControl}</td>

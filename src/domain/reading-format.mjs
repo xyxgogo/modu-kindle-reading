@@ -1,12 +1,9 @@
 function chapterHeading(line) {
   const text = String(line || "").trim();
   if (!text) return null;
-  const markdown = text.match(/^#{1,2}\s+(.{1,120})$/u);
-  if (markdown) return markdown[1].trim();
-  if (/^第\s*[0-9一二三四五六七八九十百零〇]+\s*章(?:\s+|[:：]?).{0,100}$/u.test(text)) return text;
-  if (/^Chapter\s+(?:[0-9]+|One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten)\b.{0,100}$/iu.test(text)) return text;
-  if (/^[一二三四五六七八九十]+、.{1,100}$/u.test(text)) return text;
-  if (/^[0-9]{1,3}\.\s+.{1,100}$/u.test(text)) return text;
+  // Only an explicit Chinese chapter marker is structural. Markdown titles,
+  // bare numbers and list numbering remain正文，避免误拆读物。
+  if (/^第\s*[^章\r\n]{1,24}\s*章(?:\s+.{1,100}|[:：]\s*.{1,100})?$/u.test(text)) return text;
   return null;
 }
 

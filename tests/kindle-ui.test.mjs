@@ -17,6 +17,16 @@ test("TXT 物理换行会合并，空行仍保留真正段落", () => {
   assert.equal(pages[0].includes("。\n这是"), false);
 });
 
+test("读物只按第…章拆分，不再把数字、Markdown 或英文标题误判为章节", () => {
+  const chapters = parseBookChapters(`前言内容\n\n# 这不是章节\n\n1. 这也不是章节\n\nChapter 1 Not a chapter\n\n第一章 开始\n第一章正文。\n\n第二卷 不是章节\n仍属于第一章。\n\n第十二章　继续\n第二章正文。`);
+  assert.equal(chapters.length, 3);
+  assert.equal(chapters[0].title, "序章");
+  assert.equal(chapters[1].title, "第一章 开始");
+  assert.equal(chapters[2].title, "第十二章　继续");
+  assert.match(chapters[0].body, /# 这不是章节/);
+  assert.match(chapters[1].body, /第二卷 不是章节/);
+});
+
 test("阅读分页保持自然段且容量接近目标", () => {
   const paragraph = "墨读让旧 Kindle 继续承担阅读与学习任务。".repeat(90);
   const pages = paginateChapter(paragraph, 460);
@@ -131,9 +141,22 @@ test("Kindle 阅读采用 kindle2 自适应分页、双列书架且默认显示�
   assert.match(css, /height: 1074px/u);
   assert.match(css, /book-size-64/u);
   assert.match(source, /return redirect\(returnTo\)/u);
-  assert.match(source, /<a href="\$\{escapeHtml\(returnTo\)\}">返回阅读<\/a>/u);
+  assert.match(source, /if \(url\.pathname === "\/k\/settings"\) return redirect\("\/k\/home"\)/u);
+  assert.match(source, /modu_ui_font_size_v1/u);
+  assert.match(source, /function uiFontControls/u);
   assert.doesNotMatch(source, /if \(!session \|\| session\.device_status !== "active"\) return createAutomaticDeviceSession/u);
   assert.match(source, /READING_PAGINATION_VERSION = 6/u);
+});
+
+test("管理端只允许删除已下架读物并使用东八区显示时间", async () => {
+  const source = await readFile(resolve("worker", "index.js"), "utf8");
+  assert.doesNotMatch(source, /建立原创演示读物|\/admin\/books\/sample/u);
+  assert.match(source, /if \(book\.status === "published"\)/u);
+  assert.match(source, /请先下架读物/u);
+  assert.match(source, /function formatShanghaiTime/u);
+  assert.match(source, /timeZone: "Asia\/Shanghai"/u);
+  assert.match(source, /action" value="metadata"/u);
+  assert.doesNotMatch(source, /<th>用户 ID<\/th>/u);
 });
 
 test("Kindle 登录在 200 页面保存账户 Cookie 后再自动跳转", async () => {

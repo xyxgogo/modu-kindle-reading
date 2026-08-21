@@ -35,6 +35,10 @@ test("formal MODU data renders through the Kindle shelf and TOC without fixtures
     books: [{ id: "book-1", title: "正式读物", author: "作者", href }],
   });
   assert.match(shelf, /selected-bookshelf/);
+  assert.match(shelf, /继续阅读/);
+  assert.match(shelf, /回到主页/);
+  assert.match(shelf, /我的收藏/);
+  assert.doesNotMatch(shelf, /全部书籍/);
   assert.match(shelf, /正式读物/);
   assert.match(shelf, /\/k\/cover\/book-1/);
   assert.doesNotMatch(shelf, /黄帝内经|MODU TEST|\/k\/lab/);
@@ -66,10 +70,16 @@ test("reader keeps the frozen Kindle structure and formal chapter content", () =
     totalPages: 8,
     bookLength: 3000,
     bookOffsetBefore: 0,
+    isFavorite: false,
+    favoriteCsrf: "csrf-token",
+    returnHref: "/k/read/book-1/chapter-1?start=0&page=1&size=64",
   });
   assert.match(html, /book-reader book-size-64/);
   assert.match(html, /字体大小：/);
   assert.match(html, /回到目录/);
+  assert.match(html, /回到书架/);
+  assert.match(html, />收藏<\/button>/);
+  assert.match(html, /name="return_to"/);
   assert.match(html, /book-reader\.js\?v=20260820-1/);
   assert.match(html, /这是来自 MODU 正式章节表的正文/);
 });

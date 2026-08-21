@@ -379,6 +379,21 @@ function greetingForNow(date = new Date()) {
   return "晚上好";
 }
 
+function formatShanghaiTime(value, fallback = "—") {
+  const raw = String(value || "").trim();
+  if (!raw) return fallback;
+  const normalized = /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(?::\d{2})?$/u.test(raw)
+    ? `${raw.replace(" ", "T")}Z`
+    : raw;
+  const date = new Date(normalized);
+  if (Number.isNaN(date.getTime())) return raw;
+  return new Intl.DateTimeFormat("zh-CN", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
+  }).format(date).replaceAll("/", "-");
+}
+
 function iconSvg(name, label = "") {
   const paths = {
     book: '<path d="M4 5c4-2 7-1 8 1v14c-1-2-4-3-8-1zM20 5c-4-2-7-1-8 1v14c1-2 4-3 8-1z"/>',
@@ -425,6 +440,42 @@ function interactionFeedbackScript() {
         if(buttons[k].tagName==='INPUT')buttons[k].value='正在提交…';else buttons[k].innerHTML='正在提交…';
         buttons[k].className=(buttons[k].className?buttons[k].className+' ':'')+'is-loading';
       }
+    };}
+  })();</script>`;
+}
+
+function uiFontControls() {
+  return `<div class="ui-font-controls" aria-label="页面字号"><span>字号：</span>
+    <button type="button" data-ui-size="large">大</button>
+    <button type="button" data-ui-size="medium">中</button>
+    <button type="button" data-ui-size="small">小</button>
+  </div>`;
+}
+
+function uiFontControlScript() {
+  return `<script>(function(){
+    var key='modu_ui_font_size_v1';
+    var sizes={small:1,medium:1,large:1};
+    var current='medium';
+    try{var saved=window.localStorage.getItem(key);if(sizes[saved])current=saved;}catch(ignore){}
+    function apply(size){
+      if(!sizes[size])size='medium';
+      document.body.className=document.body.className.replace(/\\bui-size-(small|medium|large)\\b/g,'').replace(/\\s+/g,' ').replace(/^\\s+|\\s+$/g,'')+' ui-size-'+size;
+      var buttons=document.querySelectorAll('[data-ui-size]');
+      for(var i=0;i<buttons.length;i+=1){
+        var active=buttons[i].getAttribute('data-ui-size')===size;
+        buttons[i].setAttribute('aria-pressed',active?'true':'false');
+        buttons[i].style.fontWeight=active?'bold':'normal';
+        buttons[i].style.textDecoration=active?'none':'underline';
+      }
+    }
+    apply(current);
+    var controls=document.querySelectorAll('[data-ui-size]');
+    for(var j=0;j<controls.length;j+=1){controls[j].onclick=function(){
+      var size=this.getAttribute('data-ui-size');
+      apply(size);
+      try{window.localStorage.setItem(key,size);}catch(ignore){}
+      return false;
     };}
   })();</script>`;
 }
@@ -643,10 +694,49 @@ function baseStyles() {
       .reader-bottom-item a, .reader-bottom-item span { font-size: 17px; }
       .admin table { font-size: 19px; }
     }
+    .ui-font-controls { margin: 0 0 14px; text-align: right; white-space: nowrap; }
+    .ui-font-controls span { font-size: 28px; font-weight: bold; }
+    .ui-font-controls button { display: inline-block; width: auto; min-width: 64px; min-height: 54px; margin: 0 0 0 7px; padding: 7px 10px; border: 2px solid #111; border-radius: 3px; background: #fff; color: #111; font: 30px/1.15 Arial, sans-serif; }
+    body.ui-size-small { font-size: 36px; }
+    body.ui-size-medium { font-size: 44px; }
+    body.ui-size-large { font-size: 52px; }
+    .ui-size-small h1, .ui-size-medium h1, .ui-size-large h1 { font-size: 1.38em; }
+    .ui-size-small h2, .ui-size-medium h2, .ui-size-large h2 { font-size: 1.12em; }
+    .ui-size-small h3, .ui-size-medium h3, .ui-size-large h3 { font-size: 1em; }
+    .ui-size-small .muted, .ui-size-medium .muted, .ui-size-large .muted { font-size: .82em; }
+    .ui-size-small .brand strong, .ui-size-medium .brand strong, .ui-size-large .brand strong { font-size: 1.2em; }
+    .ui-size-small .topbar-brand strong, .ui-size-medium .topbar-brand strong, .ui-size-large .topbar-brand strong { font-size: 1.4em; }
+    .ui-size-small .topbar-brand span, .ui-size-medium .topbar-brand span, .ui-size-large .topbar-brand span { font-size: .75em; }
+    .ui-size-small .top-link, .ui-size-medium .top-link, .ui-size-large .top-link { font-size: .82em; }
+    .ui-size-small .weather-cell, .ui-size-medium .weather-cell, .ui-size-large .weather-cell { font-size: .7em; }
+    .ui-size-small .weather-cell:nth-child(2), .ui-size-medium .weather-cell:nth-child(2), .ui-size-large .weather-cell:nth-child(2) { font-size: .86em; }
+    .ui-size-small .weather-note, .ui-size-medium .weather-note, .ui-size-large .weather-note { font-size: .6em; }
+    .ui-size-small .greeting, .ui-size-medium .greeting, .ui-size-large .greeting { font-size: 1em; }
+    .ui-size-small .home-tile, .ui-size-medium .home-tile, .ui-size-large .home-tile { min-height: 230px; font-size: .8em; }
+    .ui-size-small .home-tile h2, .ui-size-medium .home-tile h2, .ui-size-large .home-tile h2 { font-size: 1.2em; }
+    .ui-size-small .home-tile .tile-status, .ui-size-medium .home-tile .tile-status, .ui-size-large .home-tile .tile-status { font-size: .68em; }
+    .ui-size-small .summary-head strong, .ui-size-medium .summary-head strong, .ui-size-large .summary-head strong { font-size: .92em; }
+    .ui-size-small .summary-head a, .ui-size-medium .summary-head a, .ui-size-large .summary-head a { font-size: .68em; }
+    .ui-size-small .summary-item strong, .ui-size-medium .summary-item strong, .ui-size-large .summary-item strong { font-size: 1.18em; }
+    .ui-size-small .summary-item span, .ui-size-medium .summary-item span, .ui-size-large .summary-item span { font-size: .7em; }
+    .ui-size-small .menu-card, .ui-size-medium .menu-card, .ui-size-large .menu-card { min-height: 140px; }
+    .ui-size-small .menu-card strong, .ui-size-medium .menu-card strong, .ui-size-large .menu-card strong { font-size: 1em; }
+    .ui-size-small .account-card strong, .ui-size-medium .account-card strong, .ui-size-large .account-card strong { font-size: 1.05em; }
+    .ui-size-small .button, .ui-size-medium .button, .ui-size-large .button,
+    .ui-size-small button, .ui-size-medium button, .ui-size-large button,
+    .ui-size-small input[type="submit"], .ui-size-medium input[type="submit"], .ui-size-large input[type="submit"] { font-size: .82em; }
+    .ui-size-small input[type="text"], .ui-size-medium input[type="text"], .ui-size-large input[type="text"],
+    .ui-size-small input[type="password"], .ui-size-medium input[type="password"], .ui-size-large input[type="password"],
+    .ui-size-small input[type="number"], .ui-size-medium input[type="number"], .ui-size-large input[type="number"],
+    .ui-size-small textarea, .ui-size-medium textarea, .ui-size-large textarea,
+    .ui-size-small select, .ui-size-medium select, .ui-size-large select { font-size: .82em; }
+    .ui-size-small nav a, .ui-size-medium nav a, .ui-size-large nav a { font-size: .82em; }
+    .ui-size-small table, .ui-size-medium table, .ui-size-large table { font-size: .68em; }
+    .ui-size-small .study-screen h1, .ui-size-medium .study-screen h1, .ui-size-large .study-screen h1 { font-size: 1.25em; }
   `;
 }
 
-function layout({ title, body, nav = "", refresh = false, admin = false, extraHead = "", script = "", brand = true, pageClass = "" }) {
+function layout({ title, body, nav = "", refresh = false, admin = false, extraHead = "", script = "", brand = true, pageClass = "", fontControls = true }) {
   const metaRefresh = refresh ? '<meta http-equiv="refresh" content="300">' : "";
   return `<!doctype html>
 <html lang="zh-CN" class="${admin ? "admin" : "kindle"}">
@@ -662,13 +752,15 @@ function layout({ title, body, nav = "", refresh = false, admin = false, extraHe
   <style>${baseStyles()}</style>
   ${extraHead}
 </head>
-<body>
+<body class="${admin ? "" : "ui-size-medium"}">
 <main class="${escapeHtml(pageClass)}">
+  ${!admin && fontControls ? uiFontControls() : ""}
   ${brand ? '<header class="brand"><strong>墨读</strong><span class="muted">Kindle 家庭轻量学习与阅读</span></header>' : ""}
   ${body}
   ${nav ? `<nav>${nav}</nav>` : ""}
 </main>
 ${interactionFeedbackScript()}
+${!admin && fontControls ? uiFontControlScript() : ""}
 ${script}
 </body>
 </html>`;
@@ -1203,7 +1295,7 @@ async function parentHome(request, env, account, url) {
     body: `<h1>申请成为家长</h1>
       ${notices[url.searchParams.get("notice")] ? `<div class="notice">${notices[url.searchParams.get("notice")]}</div>` : ""}
       <p>当前账户属性为“孩子”。家长申请通过后，可使用阅读物管理、单词模块管理和孩子/学生设定。</p>
-      ${existing ? `<section class="card"><p>最近申请状态：${escapeHtml(existing.status)}<br>提交时间：${escapeHtml(existing.created_at)}</p>
+      ${existing ? `<section class="card"><p>最近申请状态：${escapeHtml(existing.status)}<br>提交时间：${escapeHtml(formatShanghaiTime(existing.created_at))}</p>
         ${existing.review_notes ? `<p>审核说明：${escapeHtml(existing.review_notes)}</p>` : ""}</section>` : ""}
       ${existing?.status === "pending" ? "" : `<form method="post" action="/parent">
         <input type="hidden" name="csrf_token" value="${escapeHtml(account.csrf_token)}">
@@ -1364,12 +1456,12 @@ async function parentChildOverview(env, account, childIdentifier) {
     <td>${escapeHtml(item.chapter_title || "正文")}</td>
     <td>${Number(item.page || 1)}</td>
     <td>${escapeHtml(fontScaleConfig(item.reading_font_scale).label)}</td>
-    <td>${escapeHtml(item.last_read_at || "—")}</td>
+    <td>${escapeHtml(formatShanghaiTime(item.last_read_at))}</td>
   </tr>`).join("");
   const sessionRows = (sessions.results || []).map((item) => {
     const attempts = Number(item.attempts || 0);
     const correct = Number(item.correct || 0);
-    return `<tr><td>${escapeHtml(item.started_at)}</td><td>${attempts}</td>
+    return `<tr><td>${escapeHtml(formatShanghaiTime(item.started_at))}</td><td>${attempts}</td>
       <td>${attempts ? Math.round(correct / attempts * 100) : 0}%</td><td>${escapeHtml(item.status)}</td></tr>`;
   }).join("");
   const totalAttempts = Number(wordStats?.total_attempts || 0);
@@ -1397,7 +1489,7 @@ async function parentChildOverview(env, account, childIdentifier) {
       累计正确率：${totalAttempts ? Math.round(correctAttempts / totalAttempts * 100) : 0}%<br>
       今日答题：${Number(wordStats?.today_attempts || 0)}<br>
       待复习错题：${Number(wordStats?.pending_mistakes || 0)}<br>
-      最近考核：${escapeHtml(wordStats?.latest_attempt || "尚未开始")}</p></section>
+      最近考核：${escapeHtml(formatShanghaiTime(wordStats?.latest_attempt, "尚未开始"))}</p></section>
       <h3>当前考核库</h3>${libraryCards || '<p>尚未选择单词考核库。</p>'}
       <h3>最近考核记录</h3>
       <table><thead><tr><th>开始时间</th><th>答题数</th><th>正确率</th><th>状态</th></tr></thead>
@@ -1454,8 +1546,8 @@ async function storeParentBook(env, form, account) {
       String(form.get("language") || "zh"),
       String(form.get("recommended_grade") || "").trim().slice(0, 80) || null,
       chapters.length,
-      String(form.get("source_notes") || "").trim().slice(0, 2000) || null,
-      String(form.get("rights_notes") || "").trim().slice(0, 2000) || null,
+      null,
+      "所有读物版权归作者所有。",
       account.account_id,
       cover?.originalKey || null,
       cover?.thumbnailKey || null,
@@ -1556,10 +1648,9 @@ async function parentNewBook(request, env, account) {
           <label for="recommended_grade">推荐年级</label><input id="recommended_grade" name="recommended_grade" type="text" maxlength="80">
           <label for="cover">书籍封面（JPEG，系统自动生成 Kindle 灰阶缩略图）</label><input id="cover" name="cover" type="file" accept=".jpg,.jpeg,image/jpeg">
           <label for="file">TXT 或 Markdown 文件</label><input id="file" name="file" type="file" accept=".txt,.md,.markdown,text/plain,text/markdown">
-          <p class="muted">系统会识别章节、合并文件中的物理断行并保留自然段；实际页数由孩子的 Kindle 屏幕、字号和行距自动计算。</p>
+          <p class="muted">系统只把独立行中的“第…章”识别为章节；其他数字、序号和标题保留为正文。实际页数由 Kindle 自适应计算。</p>
           <label for="body">或直接粘贴正文</label><textarea id="body" name="body" rows="16"></textarea>
-          <label for="source_notes">资料来源</label><textarea id="source_notes" name="source_notes" rows="3"></textarea>
-          <label for="rights_notes">版权或使用权限说明</label><textarea id="rights_notes" name="rights_notes" rows="3"></textarea>
+          <p><strong>版权说明：所有读物版权归作者所有。</strong></p>
           <input type="submit" value="提交管理员审核">
         </form>`,
       nav: '<a href="/parent/books">返回阅读物管理</a>',
@@ -2025,7 +2116,7 @@ async function homePage(env, url, session, user, account) {
     title: "主页",
     brand: false,
     body: `<header class="topbar"><div class="topbar-brand"><strong>墨读</strong><span>Kindle 家庭轻量学习与阅读</span></div>
-      <div class="topbar-actions"><a class="top-link" href="/k/me">${iconSvg("user")} 我的</a><a class="top-link" href="/k/settings">Aa 显示</a></div></header>
+      <div class="topbar-actions"><a class="top-link" href="/k/me">${iconSvg("user")} 我的</a></div></header>
       ${weather}${notice ? `<div class="notice">${escapeHtml(notice)}</div>` : ""}
       <h1 class="greeting">${escapeHtml(isParent ? "尊敬的家长" : greetingForNow())}，${escapeHtml(user.display_name)}</h1>
       <section class="tile-grid">${tiles}</section>
@@ -2064,67 +2155,12 @@ async function myPage(env, user, account) {
     body: `<div class="shelf-head"><div class="shelf-title"><h1>我的</h1><p>当前账户与设置</p></div><div class="shelf-actions"><a class="top-link" href="/k/home">${iconSvg("back")} 返回主页</a></div></div>
       <section class="card account-card"><strong>${escapeHtml(user.display_name)}</strong>　<span class="small-action">${isParent ? "家长账户" : "当前账户"}</span>
         <p>今日已学习 ${Number(stats?.today_words || 0)} 词 / 阅读 ${Number(stats?.today_reading || 0)} 篇</p></section>
-      <a class="card menu-card" href="/k/settings"><span class="menu-icon">${iconSvg("display")}</span><strong>显示设置</strong><span>字号、行距、阅读显示</span><span class="menu-arrow">${iconSvg("next")}</span></a>
       ${isParent ? "" : `<a class="card menu-card" href="/k/words/setup"><span class="menu-icon">${iconSvg("settings")}</span><strong>学习设置</strong><span>每日新词量 7 / 14 / 21 / 28</span><span class="menu-arrow">${iconSvg("next")}</span></a>`}
       <a class="card menu-card" href="/parent"><span class="menu-icon">${iconSvg("family")}</span><strong>账户与家庭</strong><span>${isParent ? "家庭成员、孩子与学习计划" : "当前账户、切换账户、申请成为家长"}</span><span class="menu-arrow">${iconSvg("next")}</span></a>
       <a class="card menu-card" href="${isParent ? "/parent/children" : "/k/records"}"><span class="menu-icon">${iconSvg("clock")}</span><strong>阅读记录 / 学习记录</strong><span>${recent ? `最近阅读《${escapeHtml(recent.title)}》` : "查看阅读与学习历史"}</span><span class="menu-arrow">${iconSvg("next")}</span></a>
       <a class="card menu-card" href="/k/logout"><span class="menu-icon">${iconSvg("logout")}</span><strong>退出登录</strong><span>退出当前账户，或切换到其他账户</span><span class="menu-arrow">${iconSvg("next")}</span></a>
       ${productFooter()}`,
   }));
-}
-
-async function settingsPage(request, env, session, user) {
-  const pageUrl = new URL(request.url);
-  const returnTo = safeAccountReturnTo(pageUrl.searchParams.get("return_to"), "/k/me");
-  if (request.method === "POST") {
-    const form = await request.formData();
-    if (!safeEqual(String(form.get("csrf_token") || ""), session.csrf_token)) {
-      return errorPage(403, "CSRF 校验失败", "表单已过期，请返回后重试。");
-    }
-    const fontSize = String(form.get("reading_font_scale") || "");
-    if (!["standard", "large", "extra_large", "extra_extra_large"].includes(fontSize)) {
-      return errorPage(400, "设置无效", "请选择标准、大、加大或特大字号。");
-    }
-    const lineSpacing = String(form.get("reading_line_spacing") || "");
-    if (!["compact", "standard", "comfortable"].includes(lineSpacing)) {
-      return errorPage(400, "设置无效", "请选择紧凑、标准或舒适行距。");
-    }
-    await env.DB.prepare(`
-      UPDATE user_preferences SET reading_font_scale = ?, reading_line_spacing = ?, updated_at = datetime('now') WHERE user_id = ?
-    `).bind(fontSize, lineSpacing, user.id).run();
-    return redirect(returnTo);
-  }
-  const pref = await env.DB.prepare(`
-    SELECT reading_font_scale, reading_line_spacing FROM user_preferences WHERE user_id = ? LIMIT 1
-  `).bind(user.id).first();
-  const current = pref?.reading_font_scale || "standard";
-  const currentSpacing = pref?.reading_line_spacing || "comfortable";
-  return htmlResponse(layout({
-    title: "个人显示设置",
-    body: `<h1>显示设置</h1>
-      <p class="muted">设置仅属于 ${escapeHtml(user.display_name)}，并应用于所有读物。</p>
-      ${urlFlag(request.url, "saved") ? '<div class="notice">阅读显示设置已保存。</div>' : ""}
-      <form method="post" action="/k/settings?return_to=${encodeURIComponent(returnTo)}">
-        <input type="hidden" name="csrf_token" value="${escapeHtml(session.csrf_token)}">
-        <fieldset>
-          <legend>阅读字号</legend>
-          ${["standard", "large", "extra_large", "extra_extra_large"].map((value, index) => `
-            <label class="radio-line"><input type="radio" name="reading_font_scale" value="${value}" ${current === value ? "checked" : ""}> ${["标准（微信读书参考）", "大", "加大", "最大"][index]}</label>
-          `).join("")}
-        </fieldset>
-        <fieldset><legend>阅读行距</legend>
-          ${["compact", "standard", "comfortable"].map((value, index) => `<label class="radio-line"><input type="radio" name="reading_line_spacing" value="${value}" ${currentSpacing === value ? "checked" : ""}> ${["紧凑", "标准", "舒适（默认）"][index]}</label>`).join("")}
-        </fieldset>
-        <input type="submit" value="保存设置">
-      </form>`,
-    nav: returnTo.startsWith("/k/read/")
-      ? `<a href="${escapeHtml(returnTo)}">返回阅读</a>`
-      : `<a href="/k/me">返回我的</a> | <a href="/k/home">返回主页</a>`,
-  }));
-}
-
-function urlFlag(rawUrl, name) {
-  return new URL(rawUrl).searchParams.get(name) === "1";
 }
 
 async function deviceTest(request, env, url) {
@@ -2260,7 +2296,7 @@ async function adminReviews(request, env, identity, url) {
   `).all();
   const parentCards = (applications.results || []).map((item) => `<section class="card">
     <h2>家长申请：${escapeHtml(item.username)}</h2>
-    <p>申请说明：${escapeHtml(item.reason || "未填写")}<br>提交时间：${escapeHtml(item.created_at)}</p>
+    <p>申请说明：${escapeHtml(item.reason || "未填写")}<br>提交时间：${escapeHtml(formatShanghaiTime(item.created_at))}</p>
     <form method="post" action="/admin/reviews">
       <input type="hidden" name="csrf_token" value="${escapeHtml(csrf || "")}">
       <input type="hidden" name="kind" value="parent"><input type="hidden" name="id" value="${escapeHtml(item.id)}">
@@ -2273,7 +2309,7 @@ async function adminReviews(request, env, identity, url) {
   const bookCards = (books.results || []).map((item) => `<section class="card">
     <h2>读物：${escapeHtml(item.title)}</h2>
     <p>上传家长：${escapeHtml(item.username || "未知")}<br>作者：${escapeHtml(item.author || "未署名")}<br>
-    简介：${escapeHtml(item.summary || "未填写")}<br>提交时间：${escapeHtml(item.submitted_at || "")}</p>
+    简介：${escapeHtml(item.summary || "未填写")}<br>提交时间：${escapeHtml(formatShanghaiTime(item.submitted_at))}</p>
     <form method="post" action="/admin/reviews">
       <input type="hidden" name="csrf_token" value="${escapeHtml(csrf || "")}">
       <input type="hidden" name="kind" value="book"><input type="hidden" name="id" value="${escapeHtml(item.id)}">
@@ -2398,11 +2434,10 @@ async function adminUsers(env, identity, url) {
   `).all();
   const rows = (result.results || []).map((user) => `<tr>
     <td>${user.id ? `<a href="/admin/users/${encodeURIComponent(user.id)}">${escapeHtml(user.display_name || user.username)}</a>` : escapeHtml(user.username)}</td>
-    <td>${escapeHtml(user.id || "—")}</td>
-    <td>${escapeHtml(user.created_at || "历史用户 / 未记录")}</td>
-    <td>${escapeHtml(user.last_active_at || "未记录")}</td>
-    <td>${escapeHtml(user.last_read_at || "—")}</td>
-    <td>${escapeHtml(user.last_word_at || "—")}</td>
+    <td>${escapeHtml(formatShanghaiTime(user.created_at, "历史用户 / 未记录"))}</td>
+    <td>${escapeHtml(formatShanghaiTime(user.last_active_at, "未记录"))}</td>
+    <td>${escapeHtml(formatShanghaiTime(user.last_read_at))}</td>
+    <td>${escapeHtml(formatShanghaiTime(user.last_word_at))}</td>
     <td>${escapeHtml(user.role === "parent" ? "家长" : user.role === "admin" ? "管理员" : "孩子")}</td>
     <td>${escapeHtml(user.status === "active" ? "正常" : user.status)}</td>
   </tr>`).join("");
@@ -2413,8 +2448,8 @@ async function adminUsers(env, identity, url) {
       ${noticeText(url?.searchParams.get("notice")) ? `<div class="notice">${escapeHtml(noticeText(url.searchParams.get("notice")))}</div>` : ""}
       <p class="muted">管理员：${escapeHtml(identity.email)}</p>
       <p>账户只能由用户在产品入口填写用户名和密码注册，管理员不能绕过注册流程新增使用者。</p>
-      <table><thead><tr><th>昵称</th><th>用户 ID</th><th>注册时间</th><th>最近使用</th><th>最近阅读</th><th>最近单词</th><th>身份</th><th>状态</th></tr></thead>
-      <tbody>${rows || '<tr><td colspan="8">暂无注册账户。</td></tr>'}</tbody></table>`,
+      <table><thead><tr><th>昵称</th><th>注册时间（北京时间）</th><th>最近使用（北京时间）</th><th>最近阅读</th><th>最近单词</th><th>身份</th><th>状态</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="7">暂无注册账户。</td></tr>'}</tbody></table>`,
     nav: '<a href="/admin">返回总览</a>',
   }));
 }
@@ -2449,19 +2484,18 @@ async function adminUserDetail(request, env, identity, url, userId) {
     LEFT JOIN chapters c ON c.id = rp.chapter_id
     WHERE rp.user_id = ? ORDER BY rp.last_read_at DESC
   `).bind(userId).all();
-  const progressRows = (progress.results || []).map((row) => `<tr><td>${escapeHtml(row.title)}</td><td>${escapeHtml(row.chapter_title || "—")}</td><td>${Number(row.page)}</td><td>${escapeHtml(row.font_size)}</td><td>${escapeHtml(row.last_read_at || "—")}</td></tr>`).join("");
+  const progressRows = (progress.results || []).map((row) => `<tr><td>${escapeHtml(row.title)}</td><td>${escapeHtml(row.chapter_title || "—")}</td><td>${Number(row.page)}</td><td>${escapeHtml(row.font_size)}</td><td>${escapeHtml(formatShanghaiTime(row.last_read_at))}</td></tr>`).join("");
   const notice = noticeText(url.searchParams.get("notice"));
   return htmlResponse(layout({
     title: `${user.display_name} · 使用者详情`,
     admin: true,
     body: `${adminNavigation()}<h1>使用者详情：${escapeHtml(user.display_name)}</h1>
       ${notice ? `<div class="notice">${escapeHtml(notice)}</div>` : ""}
-      <p>用户 ID：${escapeHtml(user.id)}<br>
-      身份：${escapeHtml(user.role === "parent" ? "家长" : "孩子")}<br>
-      注册日期：${escapeHtml(user.registered_at || "历史用户 / 未记录")}<br>
-      最近登录或使用：${escapeHtml(user.last_active_at || "未记录")}<br>
-      最近阅读：${escapeHtml(counts?.latest_reading || "未记录")}<br>
-      最近单词学习：${escapeHtml(counts?.latest_learning || "未记录")}</p>
+      <p>身份：${escapeHtml(user.role === "parent" ? "家长" : "孩子")}<br>
+      注册日期（北京时间）：${escapeHtml(formatShanghaiTime(user.registered_at, "历史用户 / 未记录"))}<br>
+      最近登录或使用：${escapeHtml(formatShanghaiTime(user.last_active_at, "未记录"))}<br>
+      最近阅读：${escapeHtml(formatShanghaiTime(counts?.latest_reading, "未记录"))}<br>
+      最近单词学习：${escapeHtml(formatShanghaiTime(counts?.latest_learning, "未记录"))}</p>
       <section class="card"><h2>编辑资料</h2>
         <form method="post" action="/admin/users/${escapeHtml(user.id)}">
           <input type="hidden" name="csrf_token" value="${escapeHtml(csrf || "")}">
@@ -2817,7 +2851,7 @@ async function adminReports(env, identity, url) {
         <label for="correct">答题结果</label><select id="correct" name="correct"><option value="">全部</option><option value="1"${correctness === "1" ? " selected" : ""}>正确</option><option value="0"${correctness === "0" ? " selected" : ""}>错误</option></select>
         <input type="submit" value="筛选报告">
       </form>
-      <section class="card"><h2>摘要</h2><p>答题：${total}<br>正确率：${total ? Math.round(Number(summary.correct || 0) / total * 100) : 0}%<br>学习者：${Number(summary?.learners || 0)}<br>最近学习：${escapeHtml(summary?.latest || "—")}</p></section>
+      <section class="card"><h2>摘要</h2><p>答题：${total}<br>正确率：${total ? Math.round(Number(summary.correct || 0) / total * 100) : 0}%<br>学习者：${Number(summary?.learners || 0)}<br>最近学习：${escapeHtml(formatShanghaiTime(summary?.latest))}</p></section>
       <h2>按题型</h2><table><thead><tr><th>题型</th><th>答题数</th><th>正确率</th></tr></thead><tbody>${typeRows || '<tr><td colspan="3">暂无数据。</td></tr>'}</tbody></table>
       <h2>高频错题</h2><table><thead><tr><th>使用者</th><th>题目</th><th>错误次数</th><th>最近错误</th></tr></thead><tbody>${mistakeRows || '<tr><td colspan="4">暂无错题。</td></tr>'}</tbody></table>
       <p><a href="/admin/backup/attempts.csv">导出全部答题 CSV</a></p>`,
@@ -2911,7 +2945,7 @@ async function adminImports(request, env, identity, url) {
   const jobs = await env.DB.prepare(`SELECT id, format, status, summary_json, created_at FROM import_jobs ORDER BY created_at DESC LIMIT 30`).all();
   const jobRows = (jobs.results || []).map((job) => {
     let summary = {}; try { summary = JSON.parse(job.summary_json || "{}"); } catch { /* empty */ }
-    return `<tr><td><a href="/admin/imports/${encodeURIComponent(job.id)}">${escapeHtml(job.created_at)}</a></td><td>${escapeHtml(job.format)}</td><td>${escapeHtml(job.status)}</td><td>${Number(summary.total || 0)} / ${Number(summary.valid || 0)} / ${Number(summary.invalid || 0)}</td></tr>`;
+    return `<tr><td><a href="/admin/imports/${encodeURIComponent(job.id)}">${escapeHtml(formatShanghaiTime(job.created_at))}</a></td><td>${escapeHtml(job.format)}</td><td>${escapeHtml(job.status)}</td><td>${Number(summary.total || 0)} / ${Number(summary.valid || 0)} / ${Number(summary.invalid || 0)}</td></tr>`;
   }).join("");
   const notice = noticeText(url.searchParams.get("notice"));
   return htmlResponse(layout({
@@ -3050,7 +3084,7 @@ async function adminDevices(request, env, identity, url) {
     <td>${escapeHtml(device.name)}</td>
     <td>${escapeHtml(device.status)}</td>
     <td>${escapeHtml(device.firmware_version || "—")}</td>
-    <td>${escapeHtml(device.last_seen_at || "尚未连接")}</td>
+    <td>${escapeHtml(formatShanghaiTime(device.last_seen_at, "尚未连接"))}</td>
     <td>${Number(device.sessions || 0)}</td>
     <td>${device.status === "active" ? `<form class="compact-form" method="post" action="/admin/devices/revoke">
       <input type="hidden" name="csrf_token" value="${escapeHtml(csrf || "")}">
@@ -3214,7 +3248,7 @@ async function adminWeather(request, env, identity, url) {
         <label for="rain">降雨提示</label><input id="rain" name="rain" type="text" value="${escapeHtml(weather.rain)}" required>
         <input type="submit" value="保存备用天气">
       </form>
-      <p class="muted">最近保存：${escapeHtml(row?.updated_at || "尚未手动保存")}</p>`,
+      <p class="muted">最近保存：${escapeHtml(formatShanghaiTime(row?.updated_at, "尚未手动保存"))}</p>`,
     nav: '<a href="/admin">返回总览</a>',
   }));
 }
@@ -3302,7 +3336,7 @@ async function adminAccessStats(env, identity) {
         最近 7 天：<strong>${Number(summary?.seven_days || 0)}</strong> 次<br>
         最近 7 天访客来源：<strong>${Number(summary?.recent_visitors || 0)}</strong> 个<br>
         累计页面访问：${Number(summary?.total || 0)} 次<br>
-        最近访问：${escapeHtml(summary?.latest || "尚无访问")}</p></section>
+        最近访问：${escapeHtml(formatShanghaiTime(summary?.latest, "尚无访问"))}</p></section>
       <h2>最近访问</h2>
       <table><thead><tr><th>北京时间</th><th>账户</th><th>页面</th><th>来源</th><th>设备</th></tr></thead>
       <tbody>${rows || '<tr><td colspan="5">尚无访问记录。</td></tr>'}</tbody></table>`,
@@ -3375,7 +3409,11 @@ async function adminBooks(env, identity, url) {
     <td>${escapeHtml(book.status)}</td>
     <td>${Number(book.total_chapters || 0)}</td>
     <td>${Number(book.total_pages || 0)}</td>
-    <td>${escapeHtml(book.updated_at)}</td>
+    <td>${escapeHtml(formatShanghaiTime(book.updated_at))}</td>
+    <td><a class="small-action" href="/admin/books/${escapeHtml(book.id)}">查看 / 修改</a>
+      ${book.status === "published" ? `<form class="inline-form" method="post" action="/admin/books/${escapeHtml(book.id)}">
+        <input type="hidden" name="csrf_token" value="${escapeHtml(csrf || "")}"><input type="hidden" name="action" value="unpublish">
+        <button type="submit">下架</button></form>` : `<a class="small-action" href="/admin/books/${escapeHtml(book.id)}/delete">删除</a>`}</td>
   </tr>`).join("");
   const notice = {
     uploaded: "读物已上传并完成服务器解析。",
@@ -3390,12 +3428,9 @@ async function adminBooks(env, identity, url) {
     body: `${adminNavigation()}<h1>阅读内容管理</h1>
       ${notice ? `<div class="notice">${notice}</div>` : ""}
       <a class="button" href="/admin/books/new">上传或粘贴读物</a>
-      <table><thead><tr><th>标题</th><th>作者</th><th>状态</th><th>章节</th><th>页数</th><th>更新</th></tr></thead>
-      <tbody>${rows || '<tr><td colspan="6">暂无读物。</td></tr>'}</tbody></table>
-      <form method="post" action="/admin/books/sample">
-        <input type="hidden" name="csrf_token" value="${escapeHtml(csrf || "")}">
-        <input type="submit" value="建立原创演示读物">
-      </form>`,
+      <p class="muted">删除规则：读物必须先下架，才能永久删除。</p>
+      <table><thead><tr><th>标题</th><th>作者</th><th>状态</th><th>章节</th><th>页数</th><th>更新（北京时间）</th><th>操作</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="7">暂无读物。</td></tr>'}</tbody></table>`,
     nav: '<a href="/admin">返回总览</a>',
   }));
 }
@@ -3419,10 +3454,9 @@ async function adminNewBook(request, env, identity) {
           <input id="cover" name="cover" type="file" accept=".jpg,.jpeg,image/jpeg">
           <label for="file">TXT 或 Markdown 文件（可空）</label>
           <input id="file" name="file" type="file" accept=".txt,.md,.markdown,text/plain,text/markdown">
-          <p class="muted">上传只负责章节与自然段解析；阅读时会按设备视口、字号和行距动态生成一屏一页。</p>
+          <p class="muted">系统只把独立行中的“第…章”识别为章节；其他数字、序号和标题保留为正文。阅读时由 Kindle 自适应分页。</p>
           <label for="body">或直接粘贴正文</label><textarea id="body" name="body" rows="16"></textarea>
-          <label for="source_notes">数据来源说明</label><textarea id="source_notes" name="source_notes" rows="3"></textarea>
-          <label for="rights_notes">版权或使用权限备注</label><textarea id="rights_notes" name="rights_notes" rows="3"></textarea>
+          <p><strong>版权说明：所有读物版权归作者所有。</strong></p>
           <input type="submit" value="上传并解析">
         </form>`,
       nav: '<a href="/admin/books">返回读物列表</a>',
@@ -3479,8 +3513,8 @@ async function adminNewBook(request, env, identity) {
       String(form.get("language") || "zh"),
       String(form.get("recommended_grade") || "").trim().slice(0, 80) || null,
       chapters.length,
-      String(form.get("source_notes") || "").trim().slice(0, 2000) || null,
-      String(form.get("rights_notes") || "").trim().slice(0, 2000) || null,
+       null,
+       "所有读物版权归作者所有。",
       cover?.originalKey || null,
       cover?.thumbnailKey || null,
       cover?.mediaType || null,
@@ -3518,35 +3552,6 @@ async function adminNewBook(request, env, identity) {
   return redirect(`/admin/books/${encodeURIComponent(bookId)}?notice=uploaded`);
 }
 
-async function createSampleBook(request, env) {
-  const form = await request.formData();
-  const admin = await requireAdminPost(request, env, form);
-  if (admin.response) return admin.response;
-  const exists = await env.DB.prepare(`SELECT id FROM books WHERE title = 'Kindle 墨水屏上的一天' LIMIT 1`).first();
-  if (exists) return redirect(`/admin/books/${encodeURIComponent(exists.id)}`);
-  const title = "Kindle 墨水屏上的一天";
-  const body = `第一章 清晨\n\n清晨，窗外很安静。小满打开 Kindle，看见了今天的日期和昆明天气。\n\n他使用注册账户进入墨读。页面上只有两个大按钮：阅读和单词。\n\n第二章 独立进度\n\n妙妙也想看同一本书。她登录自己的账户，阅读从第一页开始。\n\n小满再次进入时，系统仍然记得他刚才读到的位置。两个人的进度没有混在一起。\n\n第三章 不用脚本也能读\n\nKindle 没有运行 JavaScript，上一页、目录和下一页仍然可以使用。\n\n每次翻页，服务器都会保存进度。网络慢的时候，页面仍然保持简单、清楚。`;
-  const fake = new FormData();
-  fake.set("csrf_token", String(form.get("csrf_token") || ""));
-  fake.set("title", title);
-  fake.set("author", "墨读项目组");
-  fake.set("summary", "用于验证 Kindle 读物目录、翻页和多账户阅读进度的原创短篇。");
-  fake.set("language", "zh");
-  fake.set("recommended_grade", "家庭阅读兼容测试");
-  fake.set("body", body);
-  fake.set("source_notes", "系统原创演示读物，不含教材正文。");
-  fake.set("rights_notes", "可用于本站测试。");
-  const headers = new Headers(request.headers);
-  headers.delete("content-type");
-  headers.delete("content-length");
-  const replacement = new Request(request.url.replace("/sample", "/new"), {
-    method: "POST",
-    headers,
-    body: fake,
-  });
-  return adminNewBook(replacement, env, admin.identity);
-}
-
 async function adminBookDetail(request, env, identity, url, bookId) {
   const csrf = await adminCsrf(identity, env);
   const book = await env.DB.prepare(`SELECT * FROM books WHERE id = ? LIMIT 1`).bind(bookId).first();
@@ -3556,6 +3561,24 @@ async function adminBookDetail(request, env, identity, url, bookId) {
     const admin = await requireAdminPost(request, env, form);
     if (admin.response) return admin.response;
     const action = String(form.get("action") || "");
+    if (action === "metadata") {
+      const title = String(form.get("title") || "").trim().slice(0, 160);
+      if (!title) return errorPage(400, "读物标题缺失", "标题不能为空。", `<a href="/admin/books/${escapeHtml(bookId)}">返回读物详情</a>`);
+      const language = ["zh", "en", "mixed"].includes(String(form.get("language") || "")) ? String(form.get("language")) : "zh";
+      await env.DB.prepare(`
+        UPDATE books SET title = ?, author = ?, summary = ?, language = ?, recommended_grade = ?,
+          source_notes = NULL, rights_notes = ?, updated_at = datetime('now') WHERE id = ?
+      `).bind(
+        title,
+        String(form.get("author") || "").trim().slice(0, 120) || null,
+        String(form.get("summary") || "").trim().slice(0, 2000) || null,
+        language,
+        String(form.get("recommended_grade") || "").trim().slice(0, 80) || null,
+        "所有读物版权归作者所有。",
+        bookId,
+      ).run();
+      return redirect(`/admin/books/${encodeURIComponent(bookId)}?notice=metadata_updated`);
+    }
     if (action === "publish" || action === "unpublish") {
       const status = action === "publish" ? "published" : "preview";
       await env.DB.prepare(`UPDATE books SET status = ?, updated_at = datetime('now') WHERE id = ?`).bind(status, bookId).run();
@@ -3581,6 +3604,7 @@ async function adminBookDetail(request, env, identity, url, bookId) {
     uploaded: "读物已上传并解析，请检查章节后再发布。",
     published: "读物已发布到 Kindle 阅读书架。",
     unpublished: "读物已下架。",
+    metadata_updated: "读物信息已修改。",
     chapter_updated: "章节已重新分页并保存。",
     cover_saved: "Kindle 灰阶封面已生成并保存。",
   }[url.searchParams.get("notice")] || "";
@@ -3599,6 +3623,21 @@ async function adminBookDetail(request, env, identity, url, bookId) {
       状态：${escapeHtml(book.status)}<br>
       章节：${Number(book.total_chapters)}；中字号总页数：${Number(book.total_pages)}</p>
       <p>${escapeHtml(book.summary || "")}</p>
+      <p><strong>所有读物版权归作者所有。</strong></p>
+      <section class="card"><h2>修改读物信息</h2><p class="muted">读物处于上架状态时也可以修改以下信息。</p>
+        <form method="post" action="/admin/books/${escapeHtml(book.id)}">
+          <input type="hidden" name="csrf_token" value="${escapeHtml(csrf || "")}"><input type="hidden" name="action" value="metadata">
+          <label for="title">标题</label><input id="title" name="title" type="text" maxlength="160" value="${escapeHtml(book.title)}" required>
+          <label for="author">作者</label><input id="author" name="author" type="text" maxlength="120" value="${escapeHtml(book.author || "")}">
+          <label for="summary">简介</label><textarea id="summary" name="summary" rows="4">${escapeHtml(book.summary || "")}</textarea>
+          <label for="language">语言</label><select id="language" name="language">
+            <option value="zh"${book.language === "zh" ? " selected" : ""}>中文</option>
+            <option value="en"${book.language === "en" ? " selected" : ""}>英文</option>
+            <option value="mixed"${book.language === "mixed" ? " selected" : ""}>中英双语</option>
+          </select>
+          <label for="recommended_grade">推荐年级备注</label><input id="recommended_grade" name="recommended_grade" type="text" maxlength="80" value="${escapeHtml(book.recommended_grade || "")}">
+          <input type="submit" value="保存读物信息">
+        </form></section>
       <form method="post" action="/admin/books/${escapeHtml(book.id)}">
         <input type="hidden" name="csrf_token" value="${escapeHtml(csrf || "")}">
         <input type="hidden" name="action" value="${book.status === "published" ? "unpublish" : "publish"}">
@@ -3614,8 +3653,10 @@ async function adminBookDetail(request, env, identity, url, bookId) {
       <h2>章节解析结果</h2>
       <table><thead><tr><th>顺序</th><th>章节</th><th>页数</th><th>解析提示</th></tr></thead>
       <tbody>${rows}</tbody></table>
-      <section class="card"><h2>删除读物</h2><p>删除后将同时移除章节、所有孩子的本书阅读进度、收藏以及上传文件。此操作不可撤销。</p>
-        <a class="button" href="/admin/books/${escapeHtml(book.id)}/delete">进入删除确认</a></section>`,
+      ${book.status === "published"
+        ? '<section class="warning"><h2>删除读物</h2><p>当前读物仍在上架中。必须先点击“下架读物”，下架后才能删除。</p></section>'
+        : `<section class="card"><h2>删除读物</h2><p>删除后将同时移除章节、所有孩子的本书阅读进度、收藏以及上传文件。此操作不可撤销。</p>
+          <a class="button" href="/admin/books/${escapeHtml(book.id)}/delete">进入删除确认</a></section>`}`,
     nav: '<a href="/admin/books">返回读物列表</a>',
   }));
 }
@@ -3623,13 +3664,16 @@ async function adminBookDetail(request, env, identity, url, bookId) {
 async function adminBookDelete(request, env, identity, bookId) {
   const csrf = await adminCsrf(identity, env);
   const book = await env.DB.prepare(`
-    SELECT b.id, b.title, b.author, b.cover_original_key, b.cover_thumbnail_key,
+    SELECT b.id, b.title, b.author, b.status, b.cover_original_key, b.cover_thumbnail_key,
       (SELECT COUNT(*) FROM chapters c WHERE c.book_id = b.id) AS chapter_count,
       (SELECT COUNT(*) FROM reading_progress rp WHERE rp.book_id = b.id) AS progress_count,
       (SELECT COUNT(*) FROM user_book_preferences ubp WHERE ubp.book_id = b.id) AS favorite_count
     FROM books b WHERE b.id = ? LIMIT 1
   `).bind(bookId).first();
   if (!book) return errorPage(404, "读物不存在", "该读物可能已经删除。", '<a href="/admin/books">返回读物列表</a>');
+  if (book.status === "published") {
+    return errorPage(409, "请先下架读物", "上架中的读物不能删除。请返回读物详情，先执行下架。", `<a href="/admin/books/${escapeHtml(book.id)}">返回读物详情</a>`);
+  }
   if (request.method === "GET") {
     return htmlResponse(layout({
       title: `删除《${book.title}》`,
@@ -3771,19 +3815,31 @@ async function kindleBooks(request, env, user, session, account, url) {
   return htmlResponse(renderKindleLibrary({ device: detectKindleDevice(request), books, scope }));
 }
 
-async function kindleBookFavorite(request, env, user, session) {
+async function kindleBookFavorite(request, env, user, session, account) {
   const form = await request.formData();
   if (!safeEqual(String(form.get("csrf_token") || ""), session.csrf_token)) return errorPage(403, "表单已过期", "请返回书架重试。");
   const bookId = String(form.get("book_id") || "");
   const favorite = String(form.get("favorite") || "") === "1" ? 1 : 0;
-  const book = await env.DB.prepare(`SELECT id FROM books WHERE id = ? AND status = 'published' AND review_status = 'approved' LIMIT 1`).bind(bookId).first();
+  const returnTo = safeAccountReturnTo(form.get("return_to"), `/k/library?scope=${favorite ? "favorites" : "all"}`);
+  const book = await env.DB.prepare(`
+    SELECT b.id FROM books b
+    WHERE b.id = ? AND b.status = 'published' AND b.review_status = 'approved'
+      AND (
+        b.uploader_account_id IS NULL OR EXISTS (
+          SELECT 1 FROM parent_child_bindings pcb
+          WHERE pcb.parent_account_id = b.uploader_account_id
+            AND (pcb.child_account_id = ? OR pcb.child_identifier = ?)
+        )
+      )
+    LIMIT 1
+  `).bind(bookId, account.account_id, account.normalized_username).first();
   if (!book) return errorPage(404, "读物不存在", "该读物已下架或不存在。");
   await env.DB.prepare(`
     INSERT INTO user_book_preferences(user_id, book_id, is_favorite, created_at, updated_at)
     VALUES (?, ?, ?, datetime('now'), datetime('now'))
     ON CONFLICT(user_id, book_id) DO UPDATE SET is_favorite = excluded.is_favorite, updated_at = datetime('now')
   `).bind(user.id, bookId, favorite).run();
-  return redirect(`/k/library?scope=${favorite ? "favorites" : "all"}`);
+  return redirect(returnTo);
 }
 
 async function kindleBookDetail(request, env, user, account, bookId) {
@@ -3878,6 +3934,9 @@ async function kindleRead(request, env, user, session, account, bookId, chapterI
     page: estimatedCounts[chapterIndex - 1], size,
   }) : null;
   const nextChapterHref = nextChapter ? kindleReaderHref({ bookId, chapterId: nextChapter.id, size }) : null;
+  const favorite = await env.DB.prepare(`
+    SELECT is_favorite FROM user_book_preferences WHERE user_id = ? AND book_id = ? LIMIT 1
+  `).bind(user.id, bookId).first();
   await env.DB.prepare(`
     INSERT INTO reading_progress
       (id, user_id, book_id, chapter_id, page, font_size, reading_font_scale, pagination_version,
@@ -3898,6 +3957,9 @@ async function kindleRead(request, env, user, session, account, bookId, chapterI
     device: detectKindleDevice(request), book, chapter, source: chapter.body, start,
     page: pageNumber, size, previous, previousChapterHref, nextChapterHref,
     pagesBefore, totalPages, bookLength, bookOffsetBefore,
+    isFavorite: Number(favorite?.is_favorite || 0) === 1,
+    favoriteCsrf: session.csrf_token,
+    returnHref: `${url.pathname}${url.search}`,
   }));
 }
 
@@ -4672,7 +4734,7 @@ async function kindleRecords(env, user) {
     LEFT JOIN chapters c ON c.id = rp.chapter_id
     WHERE rp.user_id = ? ORDER BY rp.last_read_at DESC LIMIT 1
   `).bind(user.id).first();
-  const rows = (recent.results || []).map((item) => `<tr><td>${escapeHtml(item.started_at)}</td><td>${Number(item.attempts)}</td><td>${Number(item.attempts) ? Math.round(Number(item.correct) / Number(item.attempts) * 100) : 0}%</td><td>${escapeHtml(item.status)}</td></tr>`).join("");
+  const rows = (recent.results || []).map((item) => `<tr><td>${escapeHtml(formatShanghaiTime(item.started_at))}</td><td>${Number(item.attempts)}</td><td>${Number(item.attempts) ? Math.round(Number(item.correct) / Number(item.attempts) * 100) : 0}%</td><td>${escapeHtml(item.status)}</td></tr>`).join("");
   const total = Number(summary?.total || 0);
   return htmlResponse(layout({
     title: "学习记录",
@@ -4682,7 +4744,7 @@ async function kindleRecords(env, user) {
       累计正确率：${total ? Math.round(Number(summary.correct || 0) / total * 100) : 0}%<br>
       连续学习：${learningStreak(dateRows.results || [])} 天<br>
       待复习错题：${Number((await env.DB.prepare(`SELECT COUNT(*) AS count FROM mistakes WHERE user_id = ? AND mastery_status != 'temporary_mastered'`).bind(user.id).first())?.count || 0)}<br>
-      最近学习：${escapeHtml(summary?.latest || "尚未开始")}<br>
+      最近学习：${escapeHtml(formatShanghaiTime(summary?.latest, "尚未开始"))}<br>
       最近阅读：${latestReading ? `${escapeHtml(latestReading.title)} · ${escapeHtml(latestReading.chapter_title || "正文")} · 第 ${Number(latestReading.page)} 页` : "尚无记录"}</p></section>
       <table><thead><tr><th>开始时间</th><th>题数</th><th>正确率</th><th>状态</th></tr></thead><tbody>${rows || '<tr><td colspan="4">暂无记录。</td></tr>'}</tbody></table>`,
     nav: '<a href="/k/mistakes">错题本</a> | <a href="/k/words">单词</a> | <a href="/k/home">个人主页</a>',
@@ -4709,7 +4771,6 @@ async function routeAdmin(request, env, url) {
   if (userMatch && request.method === "POST") return adminUpdateUser(request, env, decodeURIComponent(userMatch[1]));
   if (path === "/admin/books" && request.method === "GET") return adminBooks(env, admin.identity, url);
   if (path === "/admin/books/new" && ["GET", "POST"].includes(request.method)) return adminNewBook(request, env, admin.identity);
-  if (path === "/admin/books/sample" && request.method === "POST") return createSampleBook(request, env);
   const bookSubpageMatch = path.match(/^\/admin\/books\/([^/]+)\/(edit|chapters)$/u);
   if (bookSubpageMatch && request.method === "GET") return redirect(`/admin/books/${encodeURIComponent(decodeURIComponent(bookSubpageMatch[1]))}`);
   const bookDeleteMatch = path.match(/^\/admin\/books\/([^/]+)\/delete$/u);
@@ -4786,7 +4847,7 @@ async function routeKindle(request, env, url) {
     url.pathname.startsWith("/k/practice/")
   )) return redirect("/parent");
   if ((url.pathname === "/k/library" || url.pathname === "/k/books") && request.method === "GET") return kindleBooks(request, env, user, accountSession, account, url);
-  if (url.pathname === "/k/books/favorite" && request.method === "POST") return kindleBookFavorite(request, env, user, accountSession);
+  if (url.pathname === "/k/books/favorite" && request.method === "POST") return kindleBookFavorite(request, env, user, accountSession, account);
   const coverMatch = url.pathname.match(/^\/k\/cover\/([^/]+)$/u);
   if (coverMatch && request.method === "GET") return kindleCover(env, decodeURIComponent(coverMatch[1]));
   const bookMatch = url.pathname.match(/^\/k\/book\/([^/]+)(?:\/toc)?$/u);
@@ -4818,7 +4879,7 @@ async function routeKindle(request, env, url) {
   }
   if (url.pathname === "/k/mistakes" && request.method === "GET") return kindleMistakes(env, user);
   if (url.pathname === "/k/records" && request.method === "GET") return kindleRecords(env, user);
-  if (url.pathname === "/k/settings" && ["GET", "POST"].includes(request.method)) return settingsPage(request, env, accountSession, user);
+  if (url.pathname === "/k/settings") return redirect("/k/home");
   return errorPage(404, "页面不存在", "请求的 Kindle 页面不存在。", '<a href="/k/home">个人主页</a>');
 }
 
