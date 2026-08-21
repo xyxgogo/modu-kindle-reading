@@ -17,6 +17,22 @@ test("TXT 物理换行会合并，空行仍保留真正段落", () => {
   assert.equal(pages[0].includes("。\n这是"), false);
 });
 
+test("长篇 TXT 的自然段逐行格式会保留段落分隔", () => {
+  const paragraphLines = Array.from({ length: 16 }, (_, index) => `这是第${index + 1}个自然段，源文件使用单换行分段。`).join("\n");
+  const chapters = parseBookChapters(`第一章 段落测试\n${paragraphLines}`);
+  assert.equal(chapters.length, 1);
+  assert.equal(chapters[0].body.split("\n\n").length, 16);
+});
+
+test("长篇 TXT 的编辑器物理折行仍会合并为自然段", () => {
+  const wrappedLines = Array.from({ length: 16 }, (_, index) => index % 2
+    ? "继续上一行尚未结束的内容"
+    : "这是一段被编辑器按宽度自动折行的内容").join("\n");
+  const chapters = parseBookChapters(`第一章 折行测试\n${wrappedLines}`);
+  assert.equal(chapters.length, 1);
+  assert.equal(chapters[0].body.includes("\n\n"), false);
+});
+
 test("读物只按第…章拆分，不再把数字、Markdown 或英文标题误判为章节", () => {
   const chapters = parseBookChapters(`前言内容\n\n# 这不是章节\n\n1. 这也不是章节\n\nChapter 1 Not a chapter\n\n第一章 开始\n第一章正文。\n\n第二卷 不是章节\n仍属于第一章。\n\n第十二章　继续\n第二章正文。`);
   assert.equal(chapters.length, 3);

@@ -7,7 +7,19 @@ function chapterHeading(line) {
   return null;
 }
 
-export function normalizeProseParagraphs(rawText) {
+function sourceUsesParagraphLines(rawText) {
+  const lines = String(rawText || "")
+    .replace(/^\uFEFF/u, "")
+    .replace(/\r\n?/gu, "\n")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line && !chapterHeading(line));
+  if (lines.length < 12) return false;
+  const terminalLines = lines.filter((line) => /[。！？…；.!?][”’'）)】》]*$/u.test(line)).length;
+  return terminalLines / lines.length >= 0.8;
+}
+
+export function normalizeProseParagraphs(rawText, { preserveSourceLines = false } = {}) {
   function joinWrappedLines(lines) {
     let result = "";
     for (const rawLine of lines) {
@@ -26,10 +38,16 @@ export function normalizeProseParagraphs(rawText) {
     return result;
   }
 
-  return String(rawText || "")
+  const clean = String(rawText || "")
     .replace(/^\uFEFF/u, "")
     .replace(/\r\n?/gu, "\n")
-    .replace(/\u0000/gu, "")
+    .replace(/\u0000/gu, "");
+  if (preserveSourceLines) {
+    return clean.split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+  }
+  return clean
     .split(/\n\s*\n/gu)
     .map((block) => joinWrappedLines(block.split("\n"))
       .replace(/\s+([，。！？；：、])/gu, "$1")
@@ -45,6 +63,8 @@ export function parseBookChapters(rawText) {
     .replace(/\u0000/gu, "")
     .trim();
   if (!clean) return [];
+  const preserveSourceLines = sourceUsesParagraphLines(clean);
+  const normalizeChapterBody = (lines) => normalizeProseParagraphs(lines.join("\n"), { preserveSourceLines }).join("\n\n");
   const chapters = [];
   let current = null;
   let preface = [];
@@ -52,10 +72,10 @@ export function parseBookChapters(rawText) {
     const heading = chapterHeading(line);
     if (heading) {
       if (current) {
-        current.body = normalizeProseParagraphs(current.lines.join("\n")).join("\n\n");
+        current.body = normalizeChapterBody(current.lines);
         chapters.push(current);
       } else if (preface.join("").trim()) {
-        chapters.push({ title: "序章", body: normalizeProseParagraphs(preface.join("\n")).join("\n\n"), warning: "标题前文字已作为序章保存。" });
+        chapters.push({ title: "序章", body: normalizeChapterBody(preface), warning: "标题前文字已作为序章保存。" });
       }
       current = { title: heading, lines: [], warning: "" };
       preface = [];
@@ -66,10 +86,10 @@ export function parseBookChapters(rawText) {
     }
   }
   if (current) {
-    current.body = normalizeProseParagraphs(current.lines.join("\n")).join("\n\n");
+    current.body = normalizeChapterBody(current.lines);
     chapters.push(current);
   } else if (preface.join("").trim()) {
-    chapters.push({ title: "正文", body: normalizeProseParagraphs(preface.join("\n")).join("\n\n"), warning: "未识别到章节标题，已作为单章保存。" });
+    chapters.push({ title: "正文", body: normalizeChapterBody(preface), warning: "未识别到章节标题，已作为单章保存。" });
   }
   return chapters
     .map((chapter) => ({
